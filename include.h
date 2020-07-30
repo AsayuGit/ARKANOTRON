@@ -7,20 +7,25 @@
 
 #ifdef _SDL
 #define SDLMAIN <SDL/SDL.h>
+#define SDLIMAGE <SDL/SDL_image.h>
 #endif
 
 #ifdef _XBOX
 #define SDLMAIN <SDL.h>
+#define SDLIMAGE <SDL_image.h>
 #define _SDL
 #define ROOT "D:\\"
+#define SL "\\"
 #endif
 
 #ifndef SDLMAIN // SDL2
 #define SDLMAIN <SDL2/SDL.h>
+#define SDLIMAGE <SDL2/SDL_image.h>
 #define _SDL2
 #endif
 
 #include SDLMAIN
+#include SDLIMAGE
 
 #include "types.h"
 
@@ -30,5 +35,11 @@
 #ifndef ROOT
 #define ROOT "./"
 #endif
+
+#ifndef SL
+#define SL "/"
+#endif
+
+#define _TEXTURE "ASSETS" SL "TEXTURES" SL
 
 #endif
