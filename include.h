@@ -28,6 +28,7 @@
 #include SDLIMAGE
 
 #include "types.h"
+#include "GUI_Functions.h"
 
 #define SCREEN_X 640
 #define SCREEN_Y 480
