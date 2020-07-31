@@ -1,7 +1,7 @@
 #ifndef _INCLUDE
 #define _INCLUDE
 
-//#define _SDL
+#define _SDL
 //#define _XBOX
 // Build targets
 
@@ -29,9 +29,17 @@
 
 #include "types.h"
 #include "GUI_Functions.h"
+#include "GAME_Functions.h"
+#include "keymap.h"
+#include <time.h>
+#include <math.h>
 
 #define SCREEN_X 640
 #define SCREEN_Y 480
+
+#define PADBD 20.0f
+#define BALLSPEED 10.0f
+#define PADSPEED 7.0f
 
 #ifndef ROOT
 #define ROOT "./"
