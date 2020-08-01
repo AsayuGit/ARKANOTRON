@@ -37,6 +37,7 @@
 // Game settings
 #define SCREEN_X 640
 #define SCREEN_Y 480
+#define MAX_FPS 60
 #define PADBD 15.0f
 #define BALLSPEED 10.0f
 #define PADSPEED 7.0f
@@ -45,7 +46,7 @@
 #define NBOFLIVES 3
 #define HUDHEIGHT 43
 
-#define DEADZONE 1000
+#define DEADZONE 10
 #define STICK_MAX 32768.0f
 
 #ifndef ROOT

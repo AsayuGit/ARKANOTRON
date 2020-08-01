@@ -10,9 +10,12 @@ int main(int argc, char *argv[]){
     SDL_Window* screen = NULL;
 	SDL_Surface* Loading_Surface = NULL;
     SDL_Surface* Background_Surface = NULL;
-    SDL_Surface* SpriteSheet_Surface = NULL;
+    SDL_Surface* BrickSheet_Surface = NULL;
+	SDL_Surface* PadBall_Surface = NULL;
     SDL_Surface* Heart_Surface = NULL;
     SDL_Surface* Hud_Surface = NULL;
+
+	Uint32 ColorKey;
 
 	SDL_Joystick* Player1 = NULL;
 	Vector2s Lstick;
@@ -37,7 +40,8 @@ int main(int argc, char *argv[]){
     #ifdef _SDL2
     SDL_Renderer* Renderer;
     SDL_Texture* Background_Texture = NULL;
-    SDL_Texture* SpriteSheet_Texture = NULL;
+    SDL_Texture* BrickSheet_Texture = NULL;
+	SDL_Texture* PadBall_Texture = NULL;
     SDL_Texture* Heart_Texture = NULL;
     SDL_Texture* Hud_Texture = NULL;
     #endif
@@ -63,6 +67,7 @@ int main(int argc, char *argv[]){
     // Creating the Window/Screen
     #ifdef _SDL
     screen = SDL_SetVideoMode(640, 480, 0, SDL_HWSURFACE);
+	//SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1); Vsync
     KeyStates = SDL_GetKeyState(NULL);
     #else
     screen = SDL_CreateWindow("Henlo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_X, SCREEN_Y, SDL_WINDOW_SHOWN);
@@ -80,12 +85,21 @@ int main(int argc, char *argv[]){
         fprintf(stderr, "Can't load BackgroundSurface !\n%s\n", IMG_GetError());
     }
 
-	Loading_Surface = IMG_Load(ROOT""_TEXTURE"BasicArkanoidPack.png");
-	SpriteSheet_Surface = SDL_DisplayFormat(Loading_Surface);
+	Loading_Surface = IMG_Load(ROOT""_TEXTURE"Brick.png");
+	BrickSheet_Surface = SDL_DisplayFormat(Loading_Surface);
 	SDL_FreeSurface(Loading_Surface);
-    if (SpriteSheet_Surface == NULL){
-        fprintf(stderr, "Can't load SpriteSheet_Surface !\n%s\n", IMG_GetError());
+    if (BrickSheet_Surface == NULL){
+        fprintf(stderr, "Can't load BrickSheet_Surface !\n%s\n", IMG_GetError());
     }
+
+	Loading_Surface = IMG_Load(ROOT""_TEXTURE"PadBall.png");
+	PadBall_Surface = SDL_DisplayFormat(Loading_Surface);
+	SDL_FreeSurface(Loading_Surface);
+    if (PadBall_Surface == NULL){
+        fprintf(stderr, "Can't load PadBall_Surface !\n%s\n", IMG_GetError());
+    }
+	ColorKey = SDL_MapRGB(PadBall_Surface->format, 0, 0xff, 0);
+	SDL_SetColorKey(PadBall_Surface, SDL_SRCCOLORKEY, ColorKey);
 
     Loading_Surface = IMG_Load(ROOT""_TEXTURE"Heart.png");
 	Heart_Surface = SDL_DisplayFormat(Loading_Surface);
@@ -93,6 +107,8 @@ int main(int argc, char *argv[]){
     if (Heart_Surface == NULL){
         fprintf(stderr, "Can't load Heart_Surface !\n%s\n", IMG_GetError());
     }
+	ColorKey = SDL_MapRGB(Heart_Surface->format, 0, 0xff, 0);
+	SDL_SetColorKey(Heart_Surface, SDL_SRCCOLORKEY, ColorKey);
 
     Loading_Surface = IMG_Load(ROOT""_TEXTURE"Hud3.png");
 	Hud_Surface = SDL_DisplayFormat(Loading_Surface);
@@ -107,21 +123,20 @@ int main(int argc, char *argv[]){
     #ifdef _SDL2
     Background_Texture = SDL_CreateTextureFromSurface(Renderer, Background_Surface);
     SDL_FreeSurface(Background_Surface);
-    SpriteSheet_Texture = SDL_CreateTextureFromSurface(Renderer, SpriteSheet_Surface);
-    SDL_FreeSurface(SpriteSheet_Surface);
+    BrickSheet_Texture = SDL_CreateTextureFromSurface(Renderer, BrickSheet_Surface);
+    SDL_FreeSurface(BrickSheet_Surface);
+	PadBall_Surface = SDL_CreateTextureFromSurface(Renderer, PadBall_Surface);
+	SDL_FreeSurface(PadBall_Surface);
     Heart_Texture = SDL_CreateTextureFromSurface(Renderer, Heart_Surface);
     SDL_FreeSurface(Heart_Surface);
     Hud_Texture = SDL_CreateTextureFromSurface(Renderer, Hud_Surface);
     SDL_FreeSurface(Hud_Surface);
     #endif
-    //Pad_Rect = (SDL_Rect){0, 111, 160, 25};
-	Pad_Rect.x = 0;	Pad_Rect.y = 111;	Pad_Rect.w = 160;	Pad_Rect.h = 25;
-    //Ball_Rect = (SDL_Rect){0, 81, 23, 22};
-	Ball_Rect.x = 0;	Ball_Rect.y = 81;	Ball_Rect.w = 23;	Ball_Rect.h = 22;
+	Pad_Rect.x = 0;	Pad_Rect.y = 32;	Pad_Rect.w = 160;	Pad_Rect.h = 25;
+	Ball_Rect.x = 0;	Ball_Rect.y = 0;	Ball_Rect.w = 23;	Ball_Rect.h = 22;
     for (i = 0; i < 2; i++){
         for (j = 0; j < 4; j++){
-            //Brick_Rect[j + (i * 4)] = (SDL_Rect){j * 72, i * 40, 65, 32};
-			Brick_Rect[j + (i * 4)].x = j * 72;	Brick_Rect[j + (i * 4)].y = i * 40;	Brick_Rect[j + (i * 4)].w = 65;	Brick_Rect[j + (i * 4)].h = 32;
+			Brick_Rect[j + (i * 4)].x = j * 72;	Brick_Rect[j + (i * 4)].y = i * 40;	Brick_Rect[j + (i * 4)].w = 64;	Brick_Rect[j + (i * 4)].h = 32;
         }
     }
 
@@ -143,14 +158,14 @@ GameInit:
 
     for (i = 0; i < BRICK_Y; i++){
         for (j = 0; j < BRICK_X; j++){
-            //Brick_Pos[j + (i * BRICK_X)] = (SDL_Rect){j * 65, i * 32 + HUDHEIGHT, 65, 32}; // init the briks
 			// init the briks
-			Brick_Pos[j + (i * BRICK_X)].x = j * 65;
+			Brick_Pos[j + (i * BRICK_X)].x = j * 64;
 			Brick_Pos[j + (i * BRICK_X)].y = i * 32 + HUDHEIGHT;
-			Brick_Pos[j + (i * BRICK_X)].w = 65;
+			Brick_Pos[j + (i * BRICK_X)].w = 64;
 			Brick_Pos[j + (i * BRICK_X)].h = 32;
 
             Brick_Color[j + (i * BRICK_X)] = rand()%8; // init their colors
+			//Brick_Color[j + (i * BRICK_X)] = 0;
             Brick_Hit[j + (i * BRICK_X)] = 1;
         }
     }
@@ -306,11 +321,11 @@ GameInit:
         // Drawing Everything On Screen
         #ifdef _SDL
         SDL_BlitSurface(Background_Surface, NULL, screen, NULL); // Draw the background
-        SDL_BlitSurface(SpriteSheet_Surface, &Ball_Rect, screen, &Ball_Pos); // Draw the ball
-        SDL_BlitSurface(SpriteSheet_Surface, &Pad_Rect, screen, &Pad_Pos); // Draw the bottom bar
+        SDL_BlitSurface(PadBall_Surface, &Ball_Rect, screen, &Ball_Pos); // Draw the ball
+        SDL_BlitSurface(PadBall_Surface, &Pad_Rect, screen, &Pad_Pos); // Draw the bottom bar
 		for (i = 0; i < (BRICK_X*BRICK_Y); i++){
             if (Brick_Hit[i]){
-                SDL_BlitSurface(SpriteSheet_Surface, &Brick_Rect[Brick_Color[i]], screen, &Brick_Pos[i]); // Draw the briks
+                SDL_BlitSurface(BrickSheet_Surface, &Brick_Rect[Brick_Color[i]], screen, &Brick_Pos[i]); // Draw the briks
             }
         }
         SDL_BlitSurface(Hud_Surface, NULL, screen, NULL); // Draw the Hud
@@ -324,11 +339,11 @@ GameInit:
         #else
         SDL_RenderClear(Renderer);
         SDL_RenderCopy(Renderer, Background_Texture, NULL, NULL); // Draw the background
-        SDL_RenderCopy(Renderer, SpriteSheet_Texture, &Ball_Rect, &Ball_Pos); // Draw the ball
-        SDL_RenderCopy(Renderer, SpriteSheet_Texture, &Pad_Rect, &Pad_Pos); // Draw the bottom bar
+        SDL_RenderCopy(Renderer, PadBall_Texture, &Ball_Rect, &Ball_Pos); // Draw the ball
+        SDL_RenderCopy(Renderer, PadBall_Surface, &Pad_Rect, &Pad_Pos); // Draw the bottom bar
         for (i = 0; i < (BRICK_X*BRICK_Y); i++){
             if (Brick_Hit[i]){
-                SDL_RenderCopy(Renderer, SpriteSheet_Texture, &Brick_Rect[Brick_Color[i]], &Brick_Pos[i]); // Draw the briks
+                SDL_RenderCopy(Renderer, BrickSheet_Texture, &Brick_Rect[Brick_Color[i]], &Brick_Pos[i]); // Draw the briks
             }
         }
         SDL_RenderCopy(Renderer, Hud_Texture, NULL, &Hud_Pos);// Draw the Hud
