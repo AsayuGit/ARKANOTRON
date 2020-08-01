@@ -8,6 +8,7 @@ int main(int argc, char *argv[]){
 
 // Vars
     SDL_Window* screen = NULL;
+	SDL_Surface* Loading_Surface = NULL;
     SDL_Surface* Background_Surface = NULL;
     SDL_Surface* SpriteSheet_Surface = NULL;
     SDL_Surface* Heart_Surface = NULL;
@@ -61,7 +62,7 @@ int main(int argc, char *argv[]){
     printf("Hey everything works :3\n");
     // Creating the Window/Screen
     #ifdef _SDL
-    screen = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE);
+    screen = SDL_SetVideoMode(640, 480, 0, SDL_HWSURFACE);
     KeyStates = SDL_GetKeyState(NULL);
     #else
     screen = SDL_CreateWindow("Henlo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_X, SCREEN_Y, SDL_WINDOW_SHOWN);
@@ -72,19 +73,30 @@ int main(int argc, char *argv[]){
 	Player1 = SDL_JoystickOpen(0); // We allocate Player1 to the first joystick
 
     // Loading Sprites
-    Background_Surface = IMG_Load(ROOT""_TEXTURE"""Background.png");
+    Loading_Surface = IMG_Load(ROOT""_TEXTURE"""Background.png");
+	Background_Surface = SDL_DisplayFormat(Loading_Surface);
+	SDL_FreeSurface(Loading_Surface);
     if (Background_Surface == NULL){
         fprintf(stderr, "Can't load BackgroundSurface !\n%s\n", IMG_GetError());
     }
-    SpriteSheet_Surface = IMG_Load(ROOT""_TEXTURE"BasicArkanoidPack.png");
+
+	Loading_Surface = IMG_Load(ROOT""_TEXTURE"BasicArkanoidPack.png");
+	SpriteSheet_Surface = SDL_DisplayFormat(Loading_Surface);
+	SDL_FreeSurface(Loading_Surface);
     if (SpriteSheet_Surface == NULL){
         fprintf(stderr, "Can't load SpriteSheet_Surface !\n%s\n", IMG_GetError());
     }
-    Heart_Surface = IMG_Load(ROOT""_TEXTURE"Heart.png");
+
+    Loading_Surface = IMG_Load(ROOT""_TEXTURE"Heart.png");
+	Heart_Surface = SDL_DisplayFormat(Loading_Surface);
+	SDL_FreeSurface(Loading_Surface);
     if (Heart_Surface == NULL){
         fprintf(stderr, "Can't load Heart_Surface !\n%s\n", IMG_GetError());
     }
-    Hud_Surface = IMG_Load(ROOT""_TEXTURE"Hud3.png");
+
+    Loading_Surface = IMG_Load(ROOT""_TEXTURE"Hud3.png");
+	Hud_Surface = SDL_DisplayFormat(Loading_Surface);
+	SDL_FreeSurface(Loading_Surface);
     if (Hud_Surface == NULL){
         fprintf(stderr, "Can't load Hud_Surface !\n%s\n", IMG_GetError());
     }
@@ -296,7 +308,7 @@ GameInit:
         SDL_BlitSurface(Background_Surface, NULL, screen, NULL); // Draw the background
         SDL_BlitSurface(SpriteSheet_Surface, &Ball_Rect, screen, &Ball_Pos); // Draw the ball
         SDL_BlitSurface(SpriteSheet_Surface, &Pad_Rect, screen, &Pad_Pos); // Draw the bottom bar
-        for (i = 0; i < (BRICK_X*BRICK_Y); i++){
+		for (i = 0; i < (BRICK_X*BRICK_Y); i++){
             if (Brick_Hit[i]){
                 SDL_BlitSurface(SpriteSheet_Surface, &Brick_Rect[Brick_Color[i]], screen, &Brick_Pos[i]); // Draw the briks
             }
