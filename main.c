@@ -6,17 +6,20 @@ int main(int argc, char *argv[]){
     SDL_Window* screen = NULL;
     SDL_Surface* Background_Surface = NULL;
     SDL_Surface* SpriteSheet_Surface = NULL;
+    SDL_Surface* Heart_Surface = NULL;
+    SDL_Surface* Hud_Surface = NULL;
 
     SDL_Rect Pad_Rect, Ball_Rect;
     SDL_Rect Brick_Rect[8];
-    ARK_Position Pad_Pos, Ball_Pos;
+    ARK_Position Pad_Pos, Ball_Pos, Heart_Pos, Hud_Pos;
     ARK_Position Brick_Pos[BRICK_X*BRICK_Y];
-    char Brick_Hit[BRICK_X*BRICK_Y] = {0};
-    char Brick_Color[BRICK_X*BRICK_Y] = {0};
+    char Brick_Hit[BRICK_X*BRICK_Y];
+    char Brick_Color[BRICK_X*BRICK_Y];
 
     Vector2f BallSpeed, BallFPos, PadFPos;
     char BallSides;
     float PadSpeed;
+    unsigned int Lives;
 
     char BallThrown;
 
@@ -27,6 +30,8 @@ int main(int argc, char *argv[]){
     SDL_Renderer* Renderer;
     SDL_Texture* Background_Texture = NULL;
     SDL_Texture* SpriteSheet_Texture = NULL;
+    SDL_Texture* Heart_Texture = NULL;
+    SDL_Texture* Hud_Texture = NULL;
     #endif
 
     int i, j, k;
@@ -66,11 +71,25 @@ int main(int argc, char *argv[]){
     if (SpriteSheet_Surface == NULL){
         fprintf(stderr, "Can't load SpriteSheet_Surface !\n%s\n", IMG_GetError());
     }
+    Heart_Surface = IMG_Load(ROOT""_TEXTURE"Heart.png");
+    if (Heart_Surface == NULL){
+        fprintf(stderr, "Can't load Heart_Surface !\n%s\n", IMG_GetError());
+    }
+    Hud_Surface = IMG_Load(ROOT""_TEXTURE"Hud3.png");
+    if (Hud_Surface == NULL){
+        fprintf(stderr, "Can't load Hud_Surface !\n%s\n", IMG_GetError());
+    }
+    Heart_Pos = (SDL_Rect){10, 5, Heart_Surface->w, Heart_Surface->h};
+    Hud_Pos = (SDL_Rect){0, 0, Hud_Surface->w, Hud_Surface->h};
     #ifdef _SDL2
     Background_Texture = SDL_CreateTextureFromSurface(Renderer, Background_Surface);
     SDL_FreeSurface(Background_Surface);
     SpriteSheet_Texture = SDL_CreateTextureFromSurface(Renderer, SpriteSheet_Surface);
     SDL_FreeSurface(SpriteSheet_Surface);
+    Heart_Texture = SDL_CreateTextureFromSurface(Renderer, Heart_Surface);
+    SDL_FreeSurface(Heart_Surface);
+    Hud_Texture = SDL_CreateTextureFromSurface(Renderer, Hud_Surface);
+    SDL_FreeSurface(Hud_Surface);
     #endif
     Pad_Rect = (SDL_Rect){0, 111, 160, 25};
     Ball_Rect = (SDL_Rect){0, 81, 23, 22};
@@ -81,7 +100,7 @@ int main(int argc, char *argv[]){
     }
 
     // Settings position and Logic
-
+GameInit:
     // Default pos
     PadFPos.x = (SCREEN_X - Pad_Rect.w) >> 1;
     Pad_Pos = (ARK_Position){(int)PadFPos.x, PadFPos.y, Pad_Rect.w, Pad_Rect.h};
@@ -94,10 +113,12 @@ int main(int argc, char *argv[]){
 
     for (i = 0; i < BRICK_Y; i++){
         for (j = 0; j < BRICK_X; j++){
-            Brick_Pos[j + (i * BRICK_X)] = (SDL_Rect){j * 65, i * 32, 65, 32}; // init the briks
+            Brick_Pos[j + (i * BRICK_X)] = (SDL_Rect){j * 65, i * 32 + HUDHEIGHT, 65, 32}; // init the briks
             Brick_Color[j + (i * BRICK_X)] = rand()%8; // init their colors
+            Brick_Hit[j + (i * BRICK_X)] = 1;
         }
     }
+    Lives = NBOFLIVES;
 
     BallRespown(&BallSpeed, BALLSPEED);
     PadSpeed = PADSPEED;
@@ -106,6 +127,16 @@ int main(int argc, char *argv[]){
     while (1){
 
         // Frame actions
+        
+        // Check victory conditions
+        j = 0;
+        for (i = 0; i < (BRICK_X * BRICK_Y); i++){
+            j += Brick_Hit[i];
+        }
+        if (j == 0){
+            // Victory !
+            goto GameInit;
+        }
 
         // Event
         while(SDL_PollEvent(&event)){
@@ -127,6 +158,10 @@ int main(int argc, char *argv[]){
                     BallThrown = 1;
                     break;
                 
+                case SDLK_BACKSPACE:
+                    goto GameInit;
+                    break;
+                
                 default:
                     break;
                 }
@@ -137,6 +172,7 @@ int main(int argc, char *argv[]){
             }
         }
 
+        // Pad Mouvement
         if (KeyStates[ARK_LEFT]){
             PadFPos.x -= PadSpeed;
         }else if (KeyStates[ARK_RIGHT]){
@@ -160,7 +196,7 @@ int main(int argc, char *argv[]){
         if (((BallFPos.x + (Ball_Rect.w >> 1)) > SCREEN_X) || ((BallFPos.x + (Ball_Rect.w >> 1)) < 0)){
             BallSpeed.x = -BallSpeed.x;
         }
-        if ((BallFPos.y + (Ball_Rect.h >> 1)) < 0){
+        if ((BallFPos.y + (Ball_Rect.h >> 1)) < HUDHEIGHT){
             BallSpeed.y = -BallSpeed.y;
         }
 
@@ -168,21 +204,30 @@ int main(int argc, char *argv[]){
             if ((BallFPos.y + (Ball_Rect.h >> 1)) > SCREEN_Y){ // Ball Over
                 BallRespown(&BallSpeed, BALLSPEED);
                 BallThrown = 0;
+                Lives--;
             }
         }else{
            BallFPos.x = PadFPos.x + ((Pad_Rect.w - Ball_Rect.w) >> 1);
            BallFPos.y = PadFPos.y - Ball_Rect.h - 1;
         }
 
+        // Live Max
+        if (Lives > NBOFLIVES){
+            Lives = NBOFLIVES;
+        }
+
+        if (Lives == 0){
+            goto GameInit;
+        }
 
         // Bounce with the Bar
         Bounce(&Ball_Pos, &Pad_Pos, &BallSpeed);
 
         // Bounce with the bricks
         for (i = 0; i < (BRICK_X*BRICK_Y); i++){
-            if (!Brick_Hit[i]){
+            if (Brick_Hit[i]){
                 if (Bounce(&Ball_Pos, &Brick_Pos[i], &BallSpeed)){
-                    Brick_Hit[i] = 1;
+                    Brick_Hit[i] = 0;
                 }
             }
         }
@@ -203,10 +248,15 @@ int main(int argc, char *argv[]){
         SDL_BlitSurface(SpriteSheet_Surface, &Ball_Rect, screen, &Ball_Pos); // Draw the ball
         SDL_BlitSurface(SpriteSheet_Surface, &Pad_Rect, screen, &Pad_Pos); // Draw the bottom bar
         for (i = 0; i < (BRICK_X*BRICK_Y); i++){
-            if (!Brick_Hit[i]){
+            if (Brick_Hit[i]){
                 SDL_BlitSurface(SpriteSheet_Surface, &Brick_Rect[Brick_Color[i]], screen, &Brick_Pos[i]); // Draw the briks
             }
         }
+        SDL_BlitSurface(Hud_Surface, NULL, screen, NULL); // Draw the Hud
+        for (int i = 0; i < Lives; i++){
+            SDL_BlitSurface(Heart_Surface, NULL, screen, &(SDL_Rect){Heart_Pos.x + i * (Heart_Pos.h + 15), Heart_Pos.y, Heart_Pos.w, Heart_Pos.h}); // Draw the hearts
+        }
+
         SDL_Flip(screen);
         #else
         SDL_RenderClear(Renderer);
@@ -214,9 +264,13 @@ int main(int argc, char *argv[]){
         SDL_RenderCopy(Renderer, SpriteSheet_Texture, &Ball_Rect, &Ball_Pos); // Draw the ball
         SDL_RenderCopy(Renderer, SpriteSheet_Texture, &Pad_Rect, &Pad_Pos); // Draw the bottom bar
         for (i = 0; i < (BRICK_X*BRICK_Y); i++){
-            if (!Brick_Hit[i]){
+            if (Brick_Hit[i]){
                 SDL_RenderCopy(Renderer, SpriteSheet_Texture, &Brick_Rect[Brick_Color[i]], &Brick_Pos[i]); // Draw the briks
             }
+        }
+        SDL_RenderCopy(Renderer, Hud_Texture, NULL, &Hud_Pos);// Draw the Hud
+        for (int i = 0; i < Lives; i++){
+            SDL_RenderCopy(Renderer, Heart_Texture, NULL, &(SDL_Rect){Heart_Pos.x + i * (Heart_Pos.h + 15), Heart_Pos.y, Heart_Pos.w, Heart_Pos.h}); // Draw the hearts
         }
         SDL_RenderPresent(Renderer);
         #endif

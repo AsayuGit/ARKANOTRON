@@ -34,14 +34,16 @@
 #include <time.h>
 #include <math.h>
 
+// Game settings
 #define SCREEN_X 640
 #define SCREEN_Y 480
-
-#define PADBD 20.0f
+#define PADBD 15.0f
 #define BALLSPEED 10.0f
 #define PADSPEED 7.0f
 #define BRICK_X 10
 #define BRICK_Y 5
+#define NBOFLIVES 3
+#define HUDHEIGHT 43
 
 #ifndef ROOT
 #define ROOT "./"
