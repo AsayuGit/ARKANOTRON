@@ -8,7 +8,11 @@ int main(int argc, char *argv[]){
     SDL_Surface* SpriteSheet_Surface = NULL;
 
     SDL_Rect Pad_Rect, Ball_Rect;
+    SDL_Rect Brick_Rect[8];
     ARK_Position Pad_Pos, Ball_Pos;
+    ARK_Position Brick_Pos[BRICK_X*BRICK_Y];
+    char Brick_Hit[BRICK_X*BRICK_Y] = {0};
+    char Brick_Color[BRICK_X*BRICK_Y] = {0};
 
     Vector2f BallSpeed, BallFPos, PadFPos;
     char BallSides;
@@ -23,7 +27,7 @@ int main(int argc, char *argv[]){
     SDL_Texture* SpriteSheet_Texture = NULL;
     #endif
 
-    int i;
+    int i, j, k;
 
 // Code
     srand(time(NULL));
@@ -68,6 +72,11 @@ int main(int argc, char *argv[]){
     #endif
     Pad_Rect = (SDL_Rect){0, 111, 160, 25};
     Ball_Rect = (SDL_Rect){0, 81, 23, 22};
+    for (i = 0; i < 2; i++){
+        for (j = 0; j < 4; j++){
+            Brick_Rect[j + (i * 4)] = (SDL_Rect){j * 72, i * 40, 65, 32};
+        }
+    }
 
     // Settings position and Logic
 
@@ -80,6 +89,13 @@ int main(int argc, char *argv[]){
     BallFPos.x = (SCREEN_X - Ball_Rect.w) >> 1;
     BallFPos.y = (SCREEN_Y - Ball_Rect.h) >> 1;
     Ball_Pos = (ARK_Position){(int)BallFPos.x, (int)BallFPos.y, Ball_Rect.w, Ball_Rect.h};
+
+    for (i = 0; i < BRICK_Y; i++){
+        for (j = 0; j < BRICK_X; j++){
+            Brick_Pos[j + (i * BRICK_X)] = (SDL_Rect){j * 65, i * 32, 65, 32}; // init the briks
+            Brick_Color[j + (i * BRICK_X)] = rand()%8; // init their colors
+        }
+    }
 
     BallRespown(&BallSpeed, BALLSPEED);
     PadSpeed = PADSPEED;
@@ -137,11 +153,6 @@ int main(int argc, char *argv[]){
         if (((BallFPos.x + (Ball_Rect.w >> 1)) > SCREEN_X) || ((BallFPos.x + (Ball_Rect.w >> 1)) < 0)){
             BallSpeed.x = -BallSpeed.x;
         }
-        /*
-        if (((BallFPos.y + (Ball_Rect.h >> 1)) > SCREEN_Y) || ((BallFPos.y + (Ball_Rect.h >> 1)) < 0)){
-            BallSpeed.y = -BallSpeed.y;
-        }*/
-
         if ((BallFPos.y + (Ball_Rect.h >> 1)) < 0){
             BallSpeed.y = -BallSpeed.y;
         }
@@ -154,60 +165,16 @@ int main(int argc, char *argv[]){
 
 
         // Bounce with the Bar
-        BallSides = 0;
-        if((BallSides = IsRectColliding(&Ball_Pos, &Pad_Pos))){ // If the Ball is colliding with the bottom bar
-            if ((BallSides & COL_RIGHT) && (BallSides & COL_LEFT)){
-                BallSpeed.y = -BallSpeed.y;
-            } else if ((BallSides & COL_DOWN) && (BallSides & COL_UP)){
-                BallSpeed.x = -BallSpeed.x;
-            } else if ((BallSides & COL_RIGHT) && (BallSides & COL_UP)){
-                if (BallSpeed.x >= 0){
-                    BallSpeed.x = -BallSpeed.x;
-                }
-                if (BallSpeed.y < 0){
-                    BallSpeed.y = -BallSpeed.y;
-                }
-            } else if ((BallSides & COL_LEFT) && (BallSides & COL_DOWN)){
-                if (BallSpeed.x < 0){
-                    BallSpeed.x = -BallSpeed.x;
-                }
-                if (BallSpeed.y >= 0) {
-                    BallSpeed.y = -BallSpeed.y;
-                }
-            } else if ((BallSides & COL_RIGHT) && (BallSides & COL_DOWN)){
-                if (BallSpeed.x >= 0){
-                    BallSpeed.x = -BallSpeed.x;
-                }
-                if (BallSpeed.y >= 0){
-                    BallSpeed.y = -BallSpeed.y;
-                }
-            } else if ((BallSides & COL_LEFT) && (BallSides & COL_UP)){
-                if (BallSpeed.x < 0){
-                    BallSpeed.x = -BallSpeed.x;
-                }
-                if (BallSpeed.y < 0){
-                    BallSpeed.y = -BallSpeed.y;
-                }
-            }
-        }
-        #ifdef _SHOW_COLISION
-        if (BallSides){
-            printf("BS : %d\n", BallSides);
+        Bounce(&Ball_Pos, &Pad_Pos, &BallSpeed);
 
-            if (BallSides & COL_RIGHT){
-                printf("1 Right\n"); // Right
-            }
-            if (BallSides & COL_LEFT){
-                printf("2 Left\n"); // Left
-            }
-            if (BallSides & COL_DOWN){
-                printf("4 Down\n"); // Down
-            }
-            if (BallSides & COL_UP){ // Up
-                printf("8 Up\n");
+        // Bounce with the bricks
+        for (i = 0; i < (BRICK_X*BRICK_Y); i++){
+            if (!Brick_Hit[i]){
+                if (Bounce(&Ball_Pos, &Brick_Pos[i], &BallSpeed)){
+                    Brick_Hit[i] = 1;
+                }
             }
         }
-        #endif
 
         // We add the speed to the ball each frame
         //printf("BallPos BEFORE %f %f\n", BallFPos.x, BallFPos.y);
@@ -226,12 +193,22 @@ int main(int argc, char *argv[]){
         SDL_BlitSurface(Background_Surface, NULL, screen, NULL); // Draw the background
         SDL_BlitSurface(SpriteSheet_Surface, &Ball_Rect, screen, &Ball_Pos); // Draw the ball
         SDL_BlitSurface(SpriteSheet_Surface, &Pad_Rect, screen, &Pad_Pos); // Draw the bottom bar
+        for (i = 0; i < (BRICK_X*BRICK_Y); i++){
+            if (!Brick_Hit[i]){
+                SDL_BlitSurface(SpriteSheet_Surface, &Brick_Rect[Brick_Color[i]], screen, &Brick_Pos[i]); // Draw the briks
+            }
+        }
         SDL_Flip(screen);
         #else
         SDL_RenderClear(Renderer);
         SDL_RenderCopy(Renderer, Background_Texture, NULL, NULL); // Draw the background
         SDL_RenderCopy(Renderer, SpriteSheet_Texture, &Ball_Rect, &Ball_Pos); // Draw the ball
         SDL_RenderCopy(Renderer, SpriteSheet_Texture, &Pad_Rect, &Pad_Pos); // Draw the bottom bar
+        for (i = 0; i < (BRICK_X*BRICK_Y); i++){
+            if (!Brick_Hit[i]){
+                SDL_RenderCopy(Renderer, SpriteSheet_Texture, &Brick_Rect[Brick_Color[i]], &Brick_Pos[i]); // Draw the briks
+            }
+        }
         SDL_RenderPresent(Renderer);
         #endif
         SDL_Delay(16); // 60fps lock, kinda

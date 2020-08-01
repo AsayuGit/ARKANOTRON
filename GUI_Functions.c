@@ -46,3 +46,63 @@ char IsRectColliding(SDL_Rect* Rect1, SDL_Rect* Rect2){
 
     return 0;
 }
+
+char Bounce(SDL_Rect* Rect1, SDL_Rect* Rect2, Vector2f* BallSpeed) {
+    char BallSides = 0;
+    if((BallSides = IsRectColliding(Rect1, Rect2))){ // If the Ball is colliding with the bottom bar
+        if ((BallSides & COL_RIGHT) && (BallSides & COL_LEFT)){
+            BallSpeed->y = -BallSpeed->y;
+        } else if ((BallSides & COL_DOWN) && (BallSides & COL_UP)){
+            BallSpeed->x = -BallSpeed->x;
+        } else if ((BallSides & COL_RIGHT) && (BallSides & COL_UP)){
+            if (BallSpeed->x >= 0){
+                BallSpeed->x = -BallSpeed->x;
+            }
+            if (BallSpeed->y < 0){
+                BallSpeed->y = -BallSpeed->y;
+            }
+        } else if ((BallSides & COL_LEFT) && (BallSides & COL_DOWN)){
+            if (BallSpeed->x < 0){
+                BallSpeed->x = -BallSpeed->x;
+            }
+            if (BallSpeed->y >= 0) {
+                BallSpeed->y = -BallSpeed->y;
+            }
+        } else if ((BallSides & COL_RIGHT) && (BallSides & COL_DOWN)){
+            if (BallSpeed->x >= 0){
+                BallSpeed->x = -BallSpeed->x;
+            }
+            if (BallSpeed->y >= 0){
+                BallSpeed->y = -BallSpeed->y;
+            }
+        } else if ((BallSides & COL_LEFT) && (BallSides & COL_UP)){
+            if (BallSpeed->x < 0){
+                BallSpeed->x = -BallSpeed->x;
+            }
+            if (BallSpeed->y < 0){
+                BallSpeed->y = -BallSpeed->y;
+            }
+        }
+    }
+
+    #ifdef _SHOW_COLISION
+    if (BallSides){
+        printf("BS : %d\n", BallSides);
+
+        if (BallSides & COL_RIGHT){
+            printf("1 Right\n"); // Right
+        }
+        if (BallSides & COL_LEFT){
+            printf("2 Left\n"); // Left
+        }
+        if (BallSides & COL_DOWN){
+            printf("4 Down\n"); // Down
+        }
+        if (BallSides & COL_UP){ // Up
+            printf("8 Up\n");
+        }
+    }
+    #endif
+
+    return BallSides;
+}

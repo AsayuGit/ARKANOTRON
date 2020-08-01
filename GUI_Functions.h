@@ -17,5 +17,8 @@ void Scale(Vector2i* SpriteDim, Vector2i ScreenResolution, float ScalingFactor);
 // Check if two SDL_Rect are colliding with one another and return 1 if true
 char IsRectColliding(SDL_Rect* Rect1, SDL_Rect* Rect2);
 
+// Make Rect1 bounce off Rect2 if a collision occur
+char Bounce(SDL_Rect* Rect1, SDL_Rect* Rect2, Vector2f* BallSpeed);
+
 
 #endif

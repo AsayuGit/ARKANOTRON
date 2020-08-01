@@ -40,6 +40,8 @@
 #define PADBD 20.0f
 #define BALLSPEED 10.0f
 #define PADSPEED 7.0f
+#define BRICK_X 10
+#define BRICK_Y 5
 
 #ifndef ROOT
 #define ROOT "./"
