@@ -18,6 +18,8 @@ int main(int argc, char *argv[]){
     char BallSides;
     float PadSpeed;
 
+    char BallThrown;
+
     SDL_Event event;
     const Uint8* KeyStates;
 
@@ -99,6 +101,7 @@ int main(int argc, char *argv[]){
 
     BallRespown(&BallSpeed, BALLSPEED);
     PadSpeed = PADSPEED;
+    BallThrown = 0;
 
     while (1){
 
@@ -118,6 +121,10 @@ int main(int argc, char *argv[]){
                 {
                 case SDLK_ESCAPE:
                     goto Shutdown;
+                    break;
+                
+                case SDLK_SPACE:
+                    BallThrown = 1;
                     break;
                 
                 default:
@@ -157,10 +164,14 @@ int main(int argc, char *argv[]){
             BallSpeed.y = -BallSpeed.y;
         }
 
-        if ((BallFPos.y + (Ball_Rect.h >> 1)) > SCREEN_Y){ // Ball Over
-            BallFPos.x = (SCREEN_X - Ball_Rect.w) >> 1;
-            BallFPos.y = (SCREEN_Y - Ball_Rect.h) >> 1;
-            BallRespown(&BallSpeed, BALLSPEED);
+        if (BallThrown){
+            if ((BallFPos.y + (Ball_Rect.h >> 1)) > SCREEN_Y){ // Ball Over
+                BallRespown(&BallSpeed, BALLSPEED);
+                BallThrown = 0;
+            }
+        }else{
+           BallFPos.x = PadFPos.x + ((Pad_Rect.w - Ball_Rect.w) >> 1);
+           BallFPos.y = PadFPos.y - Ball_Rect.h - 1;
         }
 
 
@@ -177,12 +188,10 @@ int main(int argc, char *argv[]){
         }
 
         // We add the speed to the ball each frame
-        //printf("BallPos BEFORE %f %f\n", BallFPos.x, BallFPos.y);
-        BallFPos.x += BallSpeed.x;
-        BallFPos.y += BallSpeed.y;
-
-        //printf("Ballspeed %f %f\n", BallSpeed.x, BallSpeed.y);
-        //printf("BallPos AFTER %f %f\n", BallFPos.x, BallFPos.y);
+        if (BallThrown){
+            BallFPos.x += BallSpeed.x;
+            BallFPos.y += BallSpeed.y;
+        }
 
         // Updating on screen ball position
         Ball_Pos.x = (int)BallFPos.x;
