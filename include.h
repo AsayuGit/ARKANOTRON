@@ -45,6 +45,9 @@
 #define NBOFLIVES 3
 #define HUDHEIGHT 43
 
+#define DEADZONE 1000
+#define STICK_MAX 32768.0f
+
 #ifndef ROOT
 #define ROOT "./"
 #endif

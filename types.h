@@ -17,4 +17,9 @@ typedef struct{
     float y;
 }Vector2f;
 
+typedef struct{
+	Sint16 x;
+	Sint16 y;
+}Vector2s;
+
 #endif

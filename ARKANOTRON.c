@@ -13,6 +13,9 @@ int main(int argc, char *argv[]){
     SDL_Surface* Heart_Surface = NULL;
     SDL_Surface* Hud_Surface = NULL;
 
+	SDL_Joystick* Player1 = NULL;
+	Vector2s Lstick;
+
     SDL_Rect Pad_Rect, Ball_Rect;
     SDL_Rect Brick_Rect[8];
     ARK_Position Pad_Pos, Ball_Pos, Heart_Pos, Hud_Pos;
@@ -65,6 +68,8 @@ int main(int argc, char *argv[]){
     Renderer = SDL_CreateRenderer(screen, -1, 0);
     KeyStates = SDL_GetKeyboardState(NULL);
     #endif
+
+	Player1 = SDL_JoystickOpen(0); // We allocate Player1 to the first joystick
 
     // Loading Sprites
     Background_Surface = IMG_Load(ROOT""_TEXTURE"""Background.png");
@@ -191,12 +196,37 @@ GameInit:
             }
         }
 
-        // Pad Mouvement
+		// Joystick control
+		SDL_JoystickUpdate();
+		if (SDL_JoystickGetButton(Player1, XB_A)){
+			BallThrown = 1;
+		}
+		if (SDL_JoystickGetButton(Player1, XB_BACK)){
+			goto GameInit;
+		}
+		Lstick.x = SDL_JoystickGetAxis(Player1, 0);
+		Lstick.y = SDL_JoystickGetAxis(Player1, 1);
+
+		// Deadzone controll
+		if ((Lstick.x < DEADZONE) && (Lstick.x > -DEADZONE)){
+			Lstick.x = 0;
+		}else{
+			PadFPos.x += PadSpeed * ((float)Lstick.x / STICK_MAX);
+		}
+
+		if ((Lstick.y < DEADZONE) && (Lstick.y > -DEADZONE)){
+			Lstick.y = 0;
+		}else{
+
+		}
+
+		// Pad Mouvement
         if (KeyStates[ARK_LEFT]){
             PadFPos.x -= PadSpeed;
         }else if (KeyStates[ARK_RIGHT]){
             PadFPos.x += PadSpeed;
         }
+
 
         // Pad boundaries
         if (PadFPos.x < PADBD){
@@ -299,7 +329,9 @@ GameInit:
     }
 
 Shutdown:
-
+	if (SDL_JoystickOpened(0)){
+		SDL_JoystickClose(Player1);
+	}
     #ifdef _SDL
     SDL_FreeSurface(Background_Surface);
     #endif
