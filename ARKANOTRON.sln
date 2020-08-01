@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ARKANOTRON", "ARKANOTRON.vcproj", "{59EBADCB-963D-4047-B14D-14B57EC06FBD}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Profile = Profile
+		Profile_FastCap = Profile_FastCap
+		Release = Release
+		Release_LTCG = Release_LTCG
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{59EBADCB-963D-4047-B14D-14B57EC06FBD}.Debug.ActiveCfg = Debug|Xbox
+		{59EBADCB-963D-4047-B14D-14B57EC06FBD}.Debug.Build.0 = Debug|Xbox
+		{59EBADCB-963D-4047-B14D-14B57EC06FBD}.Profile.ActiveCfg = Profile|Xbox
+		{59EBADCB-963D-4047-B14D-14B57EC06FBD}.Profile.Build.0 = Profile|Xbox
+		{59EBADCB-963D-4047-B14D-14B57EC06FBD}.Profile_FastCap.ActiveCfg = Profile_FastCap|Xbox
+		{59EBADCB-963D-4047-B14D-14B57EC06FBD}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
+		{59EBADCB-963D-4047-B14D-14B57EC06FBD}.Release.ActiveCfg = Release|Xbox
+		{59EBADCB-963D-4047-B14D-14B57EC06FBD}.Release.Build.0 = Release|Xbox
+		{59EBADCB-963D-4047-B14D-14B57EC06FBD}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
+		{59EBADCB-963D-4047-B14D-14B57EC06FBD}.Release_LTCG.Build.0 = Release_LTCG|Xbox
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

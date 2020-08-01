@@ -1,0 +1,313 @@
+<html>
+<head>
+<META HTTP-EQUIV="Content-Type" content="text/html; charset=Windows-1252">
+</head>
+<body>
+<pre>
+<table width=100% bgcolor=#CFCFE5><tr> <td> <font face=arial size=+3>
+Build Log
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>
+<h3>------- Build started: Project: libSDLx, Configuration: Debug|Xbox -------
+</h3>
+</pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
+Command Lines
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>Creating temporary file "c:\Documents and Settings\Asayu\Bureau\SDLx-master\Debug\RSP00000B.rsp" with contents
+[
+/Od /I "SDL\include" /I "mikmod" /I "timidity" /I "smpeg" /I "vorbis\include" /I "SDL" /I "SDL\src\thread\xbox" /I "SDL\src\thread" /I "SDL\src\audio" /I "SDL\src\timer" /I "SDL\src\events" /I "SDL\src\video" /I "SDL\src\cdrom" /I "SDL\src\joystick" /D "_DEBUG" /D "_XBOX" /D "_LIB" /D "_WINDOWS" /D "WIN32" /D "WAV_MUSIC" /D "MOD_MUSIC" /D "MID_MUSIC" /D "USE_TIMIDITY_MIDI" /D "ENABLE_DIRECTX" /D "USE_RWOPS" /D "NO_SIGNAL_H" /D "OGG_MUSIC" /D "MP3_MUSIC" /D "_MBCS" /Gm /EHsc /RTC1 /MTd /arch:SSE /Fp"Debug/libSDLx.pch" /Fo"Debug/" /Fd"Debug/vc70.pdb" /W3 /c /ZI /Gd /TC
+".\SDL_net\SDLnetUDP.c"
+".\SDL_net\SDLnetTCP.c"
+".\SDL_net\SDLnetselect.c"
+".\SDL_net\SDLnet.c"
+".\SDL_Mixer\wavestream.c"
+".\SDL_Mixer\playwave.c"
+".\SDL_Mixer\playmus.c"
+".\SDL_Mixer\music_ogg.c"
+".\SDL_Mixer\music_modplug.c"
+".\SDL_Mixer\music_mod.c"
+".\SDL_Mixer\music_mad.c"
+".\SDL_Mixer\music_flac.c"
+".\SDL_Mixer\music_cmd.c"
+".\SDL_Mixer\music.c"
+".\SDL_Mixer\mixer.c"
+".\SDL_Mixer\load_voc.c"
+".\SDL_Mixer\load_ogg.c"
+".\SDL_Mixer\load_flac.c"
+".\SDL_Mixer\load_aiff.c"
+".\SDL_Mixer\effects_internal.c"
+".\SDL_Mixer\effect_stereoreverse.c"
+".\SDL_Mixer\effect_position.c"
+".\SDL_Mixer\dynamic_ogg.c"
+".\SDL_Mixer\dynamic_mp3.c"
+".\SDL_Mixer\dynamic_mod.c"
+".\SDL_Mixer\dynamic_fluidsynth.c"
+".\SDL_Mixer\dynamic_flac.c"
+".\Sdl\src\cpuinfo\SDL_cpuinfo.c"
+".\Sdl\src\stdlib\SDL_string.c"
+".\Sdl\src\stdlib\SDL_stdlib.c"
+".\Sdl\src\stdlib\SDL_qsort.c"
+".\Sdl\src\stdlib\SDL_malloc.c"
+".\Sdl\src\stdlib\SDL_iconv.c"
+".\Sdl\src\stdlib\SDL_getenv.c"
+".\Sdl\src\cdrom\xbox\SDL_syscdrom.c"
+".\Sdl\src\cdrom\SDL_cdrom.c"
+".\Sdl\src\joystick\xbox\SDL_sysjoystick.c"
+".\Sdl\src\joystick\SDL_joystick.c"
+".\Sdl\src\events\SDL_resize.c"
+".\Sdl\src\events\SDL_quit.c"
+".\Sdl\src\events\SDL_mouse.c"
+".\Sdl\src\events\SDL_keyboard.c"
+".\Sdl\src\events\SDL_expose.c"
+".\Sdl\src\events\SDL_events.c"
+".\Sdl\src\events\SDL_active.c"
+".\Sdl\src\video\xbox\SDL_xboxvideo.c"
+".\Sdl\src\video\xbox\SDL_xboxmouse.c"
+".\Sdl\src\video\xbox\SDL_xboxevents.c"
+".\Sdl\src\video\SDL_yuv_sw.c"
+".\Sdl\src\video\SDL_yuv_mmx.c"
+".\Sdl\src\video\SDL_yuv.c"
+".\Sdl\src\video\SDL_video.c"
+".\Sdl\src\video\SDL_surface.c"
+".\Sdl\src\video\SDL_stretch.c"
+".\Sdl\src\video\SDL_RLEaccel.c"
+".\Sdl\src\video\SDL_pixels.c"
+".\Sdl\src\video\SDL_gamma.c"
+".\Sdl\src\video\SDL_cursor.c"
+".\Sdl\src\video\SDL_bmp.c"
+".\Sdl\src\video\SDL_blit_N.c"
+".\Sdl\src\video\SDL_blit_A.c"
+".\Sdl\src\video\SDL_blit_1.c"
+".\Sdl\src\video\SDL_blit_0.c"
+".\Sdl\src\video\SDL_blit.c"
+".\Sdl\src\endian\SDL_endian.c"
+".\Sdl\src\file\SDL_rwops.c"
+".\Sdl\src\timer\xbox\SDL_systimer.c"
+".\Sdl\src\timer\SDL_timer.c"
+".\Sdl\src\thread\xbox\SDL_systhread.c"
+".\Sdl\src\thread\xbox\SDL_syssem.c"
+".\Sdl\src\thread\xbox\SDL_sysmutex.c"
+".\Sdl\src\thread\xbox\SDL_syscond.c"
+".\Sdl\src\thread\SDL_thread.c"
+".\Sdl\src\audio\xbox\SDL_xboxaudio.c"
+".\Sdl\src\audio\SDL_wave.c"
+".\Sdl\src\audio\SDL_mixer_MMX_VC.c"
+".\Sdl\src\audio\SDL_mixer_MMX.c"
+".\Sdl\src\audio\SDL_mixer_m68k.c"
+".\Sdl\src\audio\SDL_mixer.c"
+".\Sdl\src\audio\SDL_audiomem.c"
+".\Sdl\src\audio\SDL_audiodev.c"
+".\Sdl\src\audio\SDL_audiocvt.c"
+".\Sdl\src\audio\SDL_audio.c"
+".\Sdl\src\SDL_fatal.c"
+".\Sdl\src\SDL_error.c"
+".\Sdl\src\SDL.c"
+]
+Creating command line "cl.exe @"c:\Documents and Settings\Asayu\Bureau\SDLx-master\Debug\RSP00000B.rsp" /nologo"
+Creating temporary file "c:\Documents and Settings\Asayu\Bureau\SDLx-master\Debug\RSP00000C.rsp" with contents
+[
+/OUT:"Debug/libSDLx.lib" /LIBPATH:"mikmod\Debug" /LIBPATH:"timidity\Debug" /LIBPATH:"smpeg\libSmegX\Debug" /LIBPATH:"vorbis\lib\Debug" /NOLOGO /IGNORE:4006 timidity.lib mikmod.lib xkbd.lib libVorbisX.lib libVorbisFileX.lib libOggX.lib ".\vorbis\lib\debug\libOggX.lib" ".\vorbis\lib\debug\libVorbisX.lib" ".\vorbis\lib\debug\libVorbisFileX.lib" ".\timidity\debug\timidity.lib" ".\mikmod\debug\mikmod.lib"
+".\debug\SDL.obj"
+".\debug\SDL_error.obj"
+".\debug\SDL_fatal.obj"
+".\debug\SDL_audio.obj"
+".\debug\SDL_audiocvt.obj"
+".\debug\SDL_audiodev.obj"
+".\debug\SDL_audiomem.obj"
+".\debug\SDL_mixer.obj"
+".\debug\SDL_mixer_m68k.obj"
+".\debug\SDL_mixer_MMX.obj"
+".\debug\SDL_mixer_MMX_VC.obj"
+".\debug\SDL_wave.obj"
+".\debug\SDL_xboxaudio.obj"
+".\debug\SDL_thread.obj"
+".\debug\SDL_syscond.obj"
+".\debug\SDL_sysmutex.obj"
+".\debug\SDL_syssem.obj"
+".\debug\SDL_systhread.obj"
+".\debug\SDL_timer.obj"
+".\debug\SDL_systimer.obj"
+".\debug\SDL_rwops.obj"
+".\debug\SDL_endian.obj"
+".\debug\SDL_blit.obj"
+".\debug\SDL_blit_0.obj"
+".\debug\SDL_blit_1.obj"
+".\debug\SDL_blit_A.obj"
+".\debug\SDL_blit_N.obj"
+".\debug\SDL_bmp.obj"
+".\debug\SDL_cursor.obj"
+".\debug\SDL_gamma.obj"
+".\debug\SDL_pixels.obj"
+".\debug\SDL_RLEaccel.obj"
+".\debug\SDL_stretch.obj"
+".\debug\SDL_surface.obj"
+".\debug\SDL_video.obj"
+".\debug\SDL_yuv.obj"
+".\debug\SDL_yuv_mmx.obj"
+".\debug\SDL_yuv_sw.obj"
+".\debug\SDL_xboxevents.obj"
+".\debug\SDL_xboxmouse.obj"
+".\debug\SDL_xboxvideo.obj"
+".\debug\SDL_active.obj"
+".\debug\SDL_events.obj"
+".\debug\SDL_expose.obj"
+".\debug\SDL_keyboard.obj"
+".\debug\SDL_mouse.obj"
+".\debug\SDL_quit.obj"
+".\debug\SDL_resize.obj"
+".\debug\SDL_joystick.obj"
+".\debug\SDL_sysjoystick.obj"
+".\debug\SDL_cdrom.obj"
+".\debug\SDL_syscdrom.obj"
+".\debug\SDL_getenv.obj"
+".\debug\SDL_iconv.obj"
+".\debug\SDL_malloc.obj"
+".\debug\SDL_qsort.obj"
+".\debug\SDL_stdlib.obj"
+".\debug\SDL_string.obj"
+".\debug\SDL_cpuinfo.obj"
+".\debug\dynamic_flac.obj"
+".\debug\dynamic_fluidsynth.obj"
+".\debug\dynamic_mod.obj"
+".\debug\dynamic_mp3.obj"
+".\debug\dynamic_ogg.obj"
+".\debug\effect_position.obj"
+".\debug\effect_stereoreverse.obj"
+".\debug\effects_internal.obj"
+".\debug\load_aiff.obj"
+".\debug\load_flac.obj"
+".\debug\load_ogg.obj"
+".\debug\load_voc.obj"
+".\debug\mixer.obj"
+".\debug\music.obj"
+".\debug\music_cmd.obj"
+".\debug\music_flac.obj"
+".\debug\music_mad.obj"
+".\debug\music_mod.obj"
+".\debug\music_modplug.obj"
+".\debug\music_ogg.obj"
+".\debug\playmus.obj"
+".\debug\playwave.obj"
+".\debug\wavestream.obj"
+".\debug\SDLnet.obj"
+".\debug\SDLnetselect.obj"
+".\debug\SDLnetTCP.obj"
+".\debug\SDLnetUDP.obj"
+]
+Creating command line "lib.exe @"c:\Documents and Settings\Asayu\Bureau\SDLx-master\Debug\RSP00000C.rsp""
+</pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
+Output Window
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>Compiling...
+SDLnetUDP.c
+SDLnetTCP.c
+SDLnetselect.c
+SDLnet.c
+wavestream.c
+playwave.c
+playmus.c
+music_ogg.c
+c:\Documents and Settings\Asayu\Bureau\SDLx-master\vorbis\include\vorbis\vorbisfile.h(59) : warning C4013: '_fseeki64' undefined; assuming extern returning int
+music_modplug.c
+music_mod.c
+music_mad.c
+music_flac.c
+music_cmd.c
+music.c
+c:\Documents and Settings\Asayu\Bureau\SDLx-master\vorbis\include\vorbis\vorbisfile.h(59) : warning C4013: '_fseeki64' undefined; assuming extern returning int
+c:\Documents and Settings\Asayu\Bureau\SDLx-master\SDL_Mixer\music.c(166) : warning C4090: 'function' : different 'const' qualifiers
+c:\Documents and Settings\Asayu\Bureau\SDLx-master\SDL_Mixer\music.c(625) : warning C4047: 'return' : 'Mix_Music *' differs in levels of indirection from 'int'
+c:\Documents and Settings\Asayu\Bureau\SDLx-master\SDL_Mixer\music.c(1529) : warning C4090: 'function' : different 'const' qualifiers
+c:\Documents and Settings\Asayu\Bureau\SDLx-master\SDL_Mixer\music.c(1568) : warning C4101: 'context' : unreferenced local variable
+mixer.c
+c:\Documents and Settings\Asayu\Bureau\SDLx-master\vorbis\include\vorbis\vorbisfile.h(59) : warning C4013: '_fseeki64' undefined; assuming extern returning int
+c:\Documents and Settings\Asayu\Bureau\SDLx-master\SDL_Mixer\mixer.c(129) : warning C4090: 'function' : different 'const' qualifiers
+c:\Documents and Settings\Asayu\Bureau\SDLx-master\SDL_Mixer\mixer.c(1143) : warning C4090: 'function' : different 'const' qualifiers
+load_voc.c
+load_ogg.c
+c:\Documents and Settings\Asayu\Bureau\SDLx-master\vorbis\include\vorbis\vorbisfile.h(59) : warning C4013: '_fseeki64' undefined; assuming extern returning int
+load_flac.c
+load_aiff.c
+effects_internal.c
+Generating Code...
+Compiling...
+effect_stereoreverse.c
+effect_position.c
+dynamic_ogg.c
+c:\Documents and Settings\Asayu\Bureau\SDLx-master\vorbis\include\vorbis\vorbisfile.h(59) : warning C4013: '_fseeki64' undefined; assuming extern returning int
+dynamic_mp3.c
+dynamic_mod.c
+dynamic_fluidsynth.c
+dynamic_flac.c
+SDL_cpuinfo.c
+SDL_string.c
+SDL_stdlib.c
+SDL_qsort.c
+SDL_malloc.c
+SDL_iconv.c
+SDL_getenv.c
+SDL_syscdrom.c
+c:\Documents and Settings\Asayu\Bureau\SDLx-master\SDL\src\cdrom\xbox\SDL_syscdrom.c(466) : warning C4018: '<=' : signed/unsigned mismatch
+SDL_cdrom.c
+SDL_sysjoystick.c
+SDL_joystick.c
+SDL_resize.c
+SDL_quit.c
+Generating Code...
+Compiling...
+SDL_mouse.c
+SDL_keyboard.c
+SDL_expose.c
+SDL_events.c
+SDL_active.c
+SDL_xboxvideo.c
+SDL_xboxmouse.c
+SDL_xboxevents.c
+SDL_yuv_sw.c
+SDL_yuv_mmx.c
+SDL_yuv.c
+SDL_video.c
+SDL_surface.c
+SDL_stretch.c
+SDL_RLEaccel.c
+SDL_pixels.c
+SDL_gamma.c
+SDL_cursor.c
+SDL_bmp.c
+SDL_blit_N.c
+Generating Code...
+Compiling...
+SDL_blit_A.c
+SDL_blit_1.c
+SDL_blit_0.c
+SDL_blit.c
+SDL_endian.c
+SDL_rwops.c
+c:\Documents and Settings\Asayu\Bureau\SDLx-master\SDL\src\file\SDL_rwops.c(55) : warning C4101: 'old_error_mode' : unreferenced local variable
+SDL_systimer.c
+SDL_timer.c
+SDL_systhread.c
+SDL_syssem.c
+SDL_sysmutex.c
+SDL_syscond.c
+SDL_thread.c
+SDL_xboxaudio.c
+SDL_wave.c
+SDL_mixer_MMX_VC.c
+SDL_mixer_MMX.c
+SDL_mixer_m68k.c
+SDL_mixer.c
+SDL_audiomem.c
+Generating Code...
+Compiling...
+SDL_audiodev.c
+SDL_audiocvt.c
+SDL_audio.c
+SDL_fatal.c
+SDL_error.c
+SDL.c
+Generating Code...
+Creating library...
+</pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
+Results
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>
+Build log was saved at "file://c:\Documents and Settings\Asayu\Bureau\SDLx-master\Debug\BuildLog.htm"
+libSDLx - 0 error(s), 13 warning(s)</pre></table><table   width=100% height=20 bgcolor=#CFCFE5><tr><td><font face=arial size=+2>
+</font></table></body></html>

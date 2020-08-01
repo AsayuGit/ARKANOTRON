@@ -1,7 +1,7 @@
 #ifndef _INCLUDE
 #define _INCLUDE
 
-#define _SDL
+//#define _SDL
 //#define _XBOX
 // Build targets
 
