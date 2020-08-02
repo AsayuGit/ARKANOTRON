@@ -1,7 +1,8 @@
 // ARKANOTRON.cpp : Defines the entry point for the application.
 //
-
+#ifdef _XBOX
 #include "stdafx.h"
+#endif
 #include "include.h"
 
 int main(int argc, char *argv[]){
@@ -32,7 +33,7 @@ int main(int argc, char *argv[]){
     float PadSpeed;
     unsigned int Lives;
 
-    char BallThrown;
+    char BallThrown, JoyAvailable;
 
     SDL_Event event;
     const Uint8* KeyStates;
@@ -46,10 +47,26 @@ int main(int argc, char *argv[]){
     SDL_Texture* Hud_Texture = NULL;
     #endif
 
+	Uint32 OldTime, NewTime, DeltaTime;
+	double FrameTimeLimit;
+
     int i, j;
 
 // Code
     srand(time(NULL));
+	OldTime = 0; NewTime = 0; FrameTimeLimit = 1000.0 / (double)MAX_FPS; JoyAvailable = 1;
+
+    // Terminal parameters
+    i = 1;
+    while (i < argc){
+        if (strcmp(argv[i], "-NoJoystick") == 0){
+            JoyAvailable = 0;
+            printf("Joystick Dissabled\n");
+        }
+        i++;
+    }
+
+
     // SDL Init
     if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
         fprintf(stderr, "SDL Initialisation failed\n%s\n", SDL_GetError());
@@ -67,65 +84,49 @@ int main(int argc, char *argv[]){
     // Creating the Window/Screen
     #ifdef _SDL
     screen = SDL_SetVideoMode(640, 480, 0, SDL_HWSURFACE);
-	//SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1); Vsync
+	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1); Vsync
     KeyStates = SDL_GetKeyState(NULL);
     #else
     screen = SDL_CreateWindow("Henlo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_X, SCREEN_Y, SDL_WINDOW_SHOWN);
     Renderer = SDL_CreateRenderer(screen, -1, 0);
+    SDL_GL_SetSwapInterval(1); // VSync
     KeyStates = SDL_GetKeyboardState(NULL);
     #endif
-
-	Player1 = SDL_JoystickOpen(0); // We allocate Player1 to the first joystick
-
+    
+    if (SDL_NumJoysticks() && JoyAvailable){
+	    Player1 = SDL_JoystickOpen(0); // Attempt to allocate Player1 to the first joystick
+        printf("There is %d available Joysticks\n", SDL_NumJoysticks());
+    }
+    #ifdef _SDL
+    JoyAvailable = SDL_JoystickOpened(0);
+    #else
+    if (Player1 == NULL){
+        JoyAvailable = 0;
+    }else{
+        JoyAvailable = 1;
+    }
+    #endif
     // Loading Sprites
-    Loading_Surface = IMG_Load(ROOT""_TEXTURE"""Background.png");
-	Background_Surface = SDL_DisplayFormat(Loading_Surface);
-	SDL_FreeSurface(Loading_Surface);
-    if (Background_Surface == NULL){
-        fprintf(stderr, "Can't load BackgroundSurface !\n%s\n", IMG_GetError());
-    }
+    Background_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"""Background.png");
+    BrickSheet_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"Brick.png");
 
-	Loading_Surface = IMG_Load(ROOT""_TEXTURE"Brick.png");
-	BrickSheet_Surface = SDL_DisplayFormat(Loading_Surface);
-	SDL_FreeSurface(Loading_Surface);
-    if (BrickSheet_Surface == NULL){
-        fprintf(stderr, "Can't load BrickSheet_Surface !\n%s\n", IMG_GetError());
-    }
+	PadBall_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"PadBall.png");
+    Heart_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"Heart.png");
 
-	Loading_Surface = IMG_Load(ROOT""_TEXTURE"PadBall.png");
-	PadBall_Surface = SDL_DisplayFormat(Loading_Surface);
-	SDL_FreeSurface(Loading_Surface);
-    if (PadBall_Surface == NULL){
-        fprintf(stderr, "Can't load PadBall_Surface !\n%s\n", IMG_GetError());
-    }
-	ColorKey = SDL_MapRGB(PadBall_Surface->format, 0, 0xff, 0);
-	SDL_SetColorKey(PadBall_Surface, SDL_SRCCOLORKEY, ColorKey);
+    // Color key
+    SetColorKey(PadBall_Surface, 0, 0xff, 0);
+    SetColorKey(Heart_Surface, 0, 0xff, 0);
 
-    Loading_Surface = IMG_Load(ROOT""_TEXTURE"Heart.png");
-	Heart_Surface = SDL_DisplayFormat(Loading_Surface);
-	SDL_FreeSurface(Loading_Surface);
-    if (Heart_Surface == NULL){
-        fprintf(stderr, "Can't load Heart_Surface !\n%s\n", IMG_GetError());
-    }
-	ColorKey = SDL_MapRGB(Heart_Surface->format, 0, 0xff, 0);
-	SDL_SetColorKey(Heart_Surface, SDL_SRCCOLORKEY, ColorKey);
+	Hud_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"Hud3.png");
 
-    Loading_Surface = IMG_Load(ROOT""_TEXTURE"Hud3.png");
-	Hud_Surface = SDL_DisplayFormat(Loading_Surface);
-	SDL_FreeSurface(Loading_Surface);
-    if (Hud_Surface == NULL){
-        fprintf(stderr, "Can't load Hud_Surface !\n%s\n", IMG_GetError());
-    }
-    //Heart_Pos = (SDL_Rect){10, 5, Heart_Surface->w, Heart_Surface->h};
 	Heart_Pos.x = 10;	Heart_Pos.y = 5;	Heart_Pos.w = Heart_Surface->w;	Heart_Pos.h = Heart_Surface->h;
-    //Hud_Pos = (SDL_Rect){0, 0, Hud_Surface->w, Hud_Surface->h};
 	Hud_Pos.x = 0;	Hud_Pos.y = 0;	Hud_Pos.w = Hud_Surface->w;	Hud_Pos.h = Hud_Surface->h;
     #ifdef _SDL2
     Background_Texture = SDL_CreateTextureFromSurface(Renderer, Background_Surface);
     SDL_FreeSurface(Background_Surface);
     BrickSheet_Texture = SDL_CreateTextureFromSurface(Renderer, BrickSheet_Surface);
     SDL_FreeSurface(BrickSheet_Surface);
-	PadBall_Surface = SDL_CreateTextureFromSurface(Renderer, PadBall_Surface);
+	PadBall_Texture = SDL_CreateTextureFromSurface(Renderer, PadBall_Surface);
 	SDL_FreeSurface(PadBall_Surface);
     Heart_Texture = SDL_CreateTextureFromSurface(Renderer, Heart_Surface);
     SDL_FreeSurface(Heart_Surface);
@@ -145,7 +146,6 @@ GameInit:
     // Default pos
     PadFPos.x = (float)((SCREEN_X - Pad_Rect.w) >> 1);
 	PadFPos.y = 0;
-    //Pad_Pos = (ARK_Position){(int)PadFPos.x, PadFPos.y, Pad_Rect.w, Pad_Rect.h};
 	Pad_Pos.x = (int)PadFPos.x;	Pad_Pos.y = (int)PadFPos.y;	Pad_Pos.w = Pad_Rect.w;	Pad_Pos.h = Pad_Rect.h;
 
     ScaleLine((int*)(&(Pad_Pos.y)), SCREEN_Y, 0.9f);
@@ -153,7 +153,6 @@ GameInit:
 
     BallFPos.x = (float)((SCREEN_X - Ball_Rect.w) >> 1);
     BallFPos.y = (float)((SCREEN_Y - Ball_Rect.h) >> 1);
-    //Ball_Pos = (ARK_Position){(int)BallFPos.x, (int)BallFPos.y, Ball_Rect.w, Ball_Rect.h};
 	Ball_Pos.x = (int)BallFPos.x;	Ball_Pos.y = (int)BallFPos.y;	Ball_Pos.w = Ball_Rect.w;	Ball_Pos.h = Ball_Rect.h;
 
     for (i = 0; i < BRICK_Y; i++){
@@ -165,7 +164,6 @@ GameInit:
 			Brick_Pos[j + (i * BRICK_X)].h = 32;
 
             Brick_Color[j + (i * BRICK_X)] = rand()%8; // init their colors
-			//Brick_Color[j + (i * BRICK_X)] = 0;
             Brick_Hit[j + (i * BRICK_X)] = 1;
         }
     }
@@ -176,6 +174,10 @@ GameInit:
     BallThrown = 0;
 
     while (1){
+		// Framerate Interpolation
+		OldTime = NewTime;
+		NewTime = SDL_GetTicks();
+		DeltaTime = (NewTime - OldTime);
 
         // Frame actions
         
@@ -224,34 +226,33 @@ GameInit:
         }
 
 		// Joystick control
-		SDL_JoystickUpdate();
-		if (SDL_JoystickGetButton(Player1, XB_A)){
-			BallThrown = 1;
-		}
-		if (SDL_JoystickGetButton(Player1, XB_BACK)){
-			goto GameInit;
-		}
-		Lstick.x = SDL_JoystickGetAxis(Player1, 0);
-		Lstick.y = SDL_JoystickGetAxis(Player1, 1);
+        if (JoyAvailable){
+            SDL_JoystickUpdate();
+            if (SDL_JoystickGetButton(Player1, JOY_A)){
+                BallThrown = 1;
+            }
+            if (SDL_JoystickGetButton(Player1, JOY_BACK)){
+                goto GameInit;
+            }
+            if (SDL_JoystickGetButton(Player1, JOY_BLACK)){ // Back to the dash (SoftReset) [XBOX]
+                goto Shutdown;
+            }
+            Lstick.x = SDL_JoystickGetAxis(Player1, 0);
+            Lstick.y = SDL_JoystickGetAxis(Player1, 1);
 
-		// Deadzone controll
-		if ((Lstick.x < DEADZONE) && (Lstick.x > -DEADZONE)){
-			Lstick.x = 0;
-		}else{
-			PadFPos.x += PadSpeed * ((float)Lstick.x / STICK_MAX);
-		}
-
-		if ((Lstick.y < DEADZONE) && (Lstick.y > -DEADZONE)){
-			Lstick.y = 0;
-		}else{
-
-		}
+            // Deadzone controll
+            if ((Lstick.x < DEADZONE) && (Lstick.x > -DEADZONE)){
+                Lstick.x = 0;
+            }else{
+                PadFPos.x += PadSpeed * ((float)Lstick.x / STICK_MAX) * DeltaTime;
+            }
+        }
 
 		// Pad Mouvement
         if (KeyStates[ARK_LEFT]){
-            PadFPos.x -= PadSpeed;
+            PadFPos.x -= PadSpeed * DeltaTime;
         }else if (KeyStates[ARK_RIGHT]){
-            PadFPos.x += PadSpeed;
+            PadFPos.x += PadSpeed * DeltaTime;
         }
 
 
@@ -310,8 +311,8 @@ GameInit:
 
         // We add the speed to the ball each frame
         if (BallThrown){
-            BallFPos.x += BallSpeed.x;
-            BallFPos.y += BallSpeed.y;
+            BallFPos.x += BallSpeed.x * DeltaTime;
+            BallFPos.y += BallSpeed.y *DeltaTime;
         }
 
         // Updating on screen ball position
@@ -340,7 +341,7 @@ GameInit:
         SDL_RenderClear(Renderer);
         SDL_RenderCopy(Renderer, Background_Texture, NULL, NULL); // Draw the background
         SDL_RenderCopy(Renderer, PadBall_Texture, &Ball_Rect, &Ball_Pos); // Draw the ball
-        SDL_RenderCopy(Renderer, PadBall_Surface, &Pad_Rect, &Pad_Pos); // Draw the bottom bar
+        SDL_RenderCopy(Renderer, PadBall_Texture, &Pad_Rect, &Pad_Pos); // Draw the bottom bar
         for (i = 0; i < (BRICK_X*BRICK_Y); i++){
             if (Brick_Hit[i]){
                 SDL_RenderCopy(Renderer, BrickSheet_Texture, &Brick_Rect[Brick_Color[i]], &Brick_Pos[i]); // Draw the briks
@@ -356,10 +357,10 @@ GameInit:
     }
 
 Shutdown:
-	if (SDL_JoystickOpened(0)){
+    #ifdef _SDL
+    if (SDL_JoystickOpened(0)){
 		SDL_JoystickClose(Player1);
 	}
-    #ifdef _SDL
     SDL_FreeSurface(Background_Surface);
     #endif
 
@@ -369,6 +370,12 @@ Shutdown:
 
     IMG_Quit();
     SDL_Quit();
+
+    #ifdef _XBOX
+    LD_LAUNCH_DASHBOARD LaunchData;
+    LaunchData.dwReason = XLD_LAUNCH_DASHBOARD_MAIN_MENU;
+    XLaunchNewImage(NULL, (LAUNCH_DATA*)&LaunchData);
+    #endif
 
     return 0;
 }

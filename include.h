@@ -33,20 +33,21 @@
 #include "keymap.h"
 #include <time.h>
 #include <math.h>
+#include <string.h>
 
 // Game settings
 #define SCREEN_X 640
 #define SCREEN_Y 480
 #define MAX_FPS 60
 #define PADBD 15.0f
-#define BALLSPEED 10.0f
-#define PADSPEED 7.0f
+#define BALLSPEED 0.6f
+#define PADSPEED 0.4f
 #define BRICK_X 10
 #define BRICK_Y 5
 #define NBOFLIVES 3
 #define HUDHEIGHT 43
 
-#define DEADZONE 10
+#define DEADZONE 0
 #define STICK_MAX 32768.0f
 
 #ifndef ROOT

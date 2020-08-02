@@ -20,5 +20,9 @@ char IsRectColliding(SDL_Rect* Rect1, SDL_Rect* Rect2);
 // Make Rect1 bounce off Rect2 if a collision occur
 char Bounce(SDL_Rect* Rect1, SDL_Rect* Rect2, Vector2f* BallSpeed);
 
+// Load a picture in memory as a surface
+SDL_Surface* LoadSufaceFromFile(char Path[]);
+
+void SetColorKey(SDL_Surface* Surface, Uint8 R, Uint8 G, Uint8 B);
 
 #endif

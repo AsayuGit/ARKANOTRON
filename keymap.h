@@ -19,18 +19,31 @@
 #endif
 
 #ifdef _XBOX
-#define XB_A 0
-#define XB_B 1
-#define XB_X 2
-#define XB_Y 3
-#define XB_BLACK 4
-#define XB_WHITE 5
-#define XB_LTRIGGER 6
-#define XB_RTRIGGER 7
-#define XB_START 8
-#define XB_BACK 9
-#define XB_LSTICK 10
-#define XB_RSTICK 11
+#define JOY_A 0
+#define JOY_B 1
+#define JOY_X 2
+#define JOY_Y 3
+#define JOY_BLACK 4
+#define JOY_WHITE 5
+#define JOY_LTRIGGER 6
+#define JOY_RTRIGGER 7
+#define JOY_START 8
+#define JOY_BACK 9
+#define JOY_LSTICK 10
+#define JOY_RSTICK 11
+#else
+#define JOY_A 0 // Temp Values
+#define JOY_B 1
+#define JOY_X 2
+#define JOY_Y 3
+#define JOY_BLACK 4
+#define JOY_WHITE 5
+#define JOY_LTRIGGER 6
+#define JOY_RTRIGGER 7
+#define JOY_START 8
+#define JOY_BACK 9
+#define JOY_LSTICK 10
+#define JOY_RSTICK 11
 #endif
 
 #endif

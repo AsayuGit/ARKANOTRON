@@ -106,3 +106,30 @@ char Bounce(SDL_Rect* Rect1, SDL_Rect* Rect2, Vector2f* BallSpeed) {
 
     return BallSides;
 }
+
+SDL_Surface* LoadSufaceFromFile(char Path[]){
+    SDL_Surface* Return_Surface = NULL;
+    #ifdef _SDL
+    SDL_Surface* Loading_Surface = NULL;
+    Loading_Surface = IMG_Load(Path);
+	Return_Surface = SDL_DisplayFormat(Loading_Surface);
+    SDL_FreeSurface(Loading_Surface);
+    #else
+    Return_Surface = IMG_Load(Path);
+    #endif
+    if (Return_Surface == NULL){
+        fprintf(stderr, "Can't load %s !\n%s\n", Path, IMG_GetError());
+    }
+    return Return_Surface;
+}
+
+void SetColorKey(SDL_Surface* Surface, Uint8 R, Uint8 G, Uint8 B){
+    Uint32 Key;
+
+    Key = SDL_MapRGB(Surface->format, R, G, B);
+    #ifdef _SDL
+	SDL_SetColorKey(Surface, SDL_SRCCOLORKEY, Key);
+    #else
+    SDL_SetColorKey(Surface, SDL_TRUE, Key);
+    #endif
+}
