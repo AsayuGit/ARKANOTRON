@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Asayu\Mes documents\Visual Studio Projects\ARKANOTRON\SDLx-master\SDL_Image&quot;;&quot;C:\Documents and Settings\Asayu\Mes documents\Visual Studio Projects\ARKANOTRON\SDLx-master\SDL\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Asayu\Mes documents\Visual Studio Projects\ARKANOTRON\SDLx-master\SDL\include&quot;"
 				PreprocessorDefinitions="_DEBUG;_XBOX"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -36,10 +36,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libSDLx.lib SDL_Image.lib xapilibd.lib d3d8d.lib d3dx8d.lib xgraphicsd.lib dsoundd.lib dmusicd.lib xactengd.lib xsndtrkd.lib xvoiced.lib xonlined.lib xboxkrnl.lib xbdm.lib"
+				AdditionalDependencies="libSDLx.lib libSmpegX.lib xapilibd.lib d3d8d.lib d3dx8d.lib xgraphicsd.lib dsoundd.lib dmusicd.lib xactengd.lib xsndtrkd.lib xvoiced.lib xonlined.lib xboxkrnl.lib xbdm.lib"
 				OutputFile="$(OutDir)/$(ProjectName).exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;C:\Documents and Settings\Asayu\Mes documents\Visual Studio Projects\ARKANOTRON\SDLx-master\SDL_Image\Debug&quot;;&quot;C:\Documents and Settings\Asayu\Mes documents\Visual Studio Projects\ARKANOTRON\SDLx-master\Debug&quot;"
+				AdditionalLibraryDirectories="&quot;C:\Documents and Settings\Asayu\Mes documents\Visual Studio Projects\ARKANOTRON\SDLx-master\smpeg\Xbox\Debug&quot;;&quot;C:\Documents and Settings\Asayu\Mes documents\Visual Studio Projects\ARKANOTRON\SDLx-master\Debug&quot;"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="2"

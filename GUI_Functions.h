@@ -25,4 +25,10 @@ SDL_Surface* LoadSufaceFromFile(char Path[]);
 
 void SetColorKey(SDL_Surface* Surface, Uint8 R, Uint8 G, Uint8 B);
 
+// Load a sound chunk from a file
+Mix_Chunk* LoadChuckFromFile(char Path[]);
+
+// Load music track from a file
+Mix_Music* LoadMusicFromFile(char Path[]);
+
 #endif

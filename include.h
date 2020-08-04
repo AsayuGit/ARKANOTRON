@@ -3,16 +3,19 @@
 
 //#define _SDL
 //#define _XBOX
+#define _MP3
 // Build targets
 
 #ifdef _SDL
 #define SDLMAIN <SDL/SDL.h>
 #define SDLIMAGE <SDL/SDL_image.h>
+#define SDLMIXER <SDL/SDL_mixer.h>
 #endif
 
 #ifdef _XBOX
 #define SDLMAIN <SDL.h>
 #define SDLIMAGE <SDL_image.h>
+#define SDLMIXER <SDL_mixer.h>
 #define _SDL
 #define ROOT "D:\\"
 #define SL "\\"
@@ -21,11 +24,13 @@
 #ifndef SDLMAIN // SDL2
 #define SDLMAIN <SDL2/SDL.h>
 #define SDLIMAGE <SDL2/SDL_image.h>
+#define SDLMIXER <SDL2/SDL_mixer.h>
 #define _SDL2
 #endif
 
 #include SDLMAIN
-#include SDLIMAGE
+//#include SDLIMAGE
+#include SDLMIXER
 
 #include "types.h"
 #include "GUI_Functions.h"
@@ -58,6 +63,18 @@
 #define SL "/"
 #endif
 
+#ifndef TEX
+#ifdef _PNG
+#define TEX ".png"
+#else
+#define TEX ".bmp"
+#endif
+#endif
+
+#define SMX ".mp3"
+#define SDX ".wav"
+
 #define _TEXTURE "ASSETS" SL "TEXTURES" SL
+#define _SOUNDS "ASSETS" SL "SOUNDS" SL
 
 #endif

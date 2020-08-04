@@ -111,14 +111,23 @@ SDL_Surface* LoadSufaceFromFile(char Path[]){
     SDL_Surface* Return_Surface = NULL;
     #ifdef _SDL
     SDL_Surface* Loading_Surface = NULL;
+#ifdef _PNG
     Loading_Surface = IMG_Load(Path);
+#else
+	Loading_Surface = SDL_LoadBMP(Path);
+#endif
 	Return_Surface = SDL_DisplayFormat(Loading_Surface);
     SDL_FreeSurface(Loading_Surface);
     #else
     Return_Surface = IMG_Load(Path);
     #endif
     if (Return_Surface == NULL){
+#ifdef _PNG
         fprintf(stderr, "Can't load %s !\n%s\n", Path, IMG_GetError());
+#else
+		fprintf(stderr, "Can't load %s !\n%s\n", Path, SDL_GetError());
+#endif
+		return NULL;
     }
     return Return_Surface;
 }
@@ -132,4 +141,25 @@ void SetColorKey(SDL_Surface* Surface, Uint8 R, Uint8 G, Uint8 B){
     #else
     SDL_SetColorKey(Surface, SDL_TRUE, Key);
     #endif
+}
+
+Mix_Chunk* LoadChuckFromFile(char Path[]){
+	Mix_Chunk* LoadingChunk = NULL;
+	LoadingChunk = Mix_LoadWAV(Path);
+	if (LoadingChunk == NULL){
+		fprintf(stderr, "Cound't load %s\n", Mix_GetError());
+		return NULL;
+	}
+	return LoadingChunk;
+}
+
+Mix_Music* LoadMusicFromFile(char Path[]){
+	Mix_Music* LoadingMusic = NULL;
+	LoadingMusic = Mix_LoadMUS(Path);
+	if (LoadingMusic == NULL){
+		fprintf(stderr, "Cound't load %s\n", Mix_GetError());
+		return NULL;
+	}
+	return LoadingMusic;
+
 }

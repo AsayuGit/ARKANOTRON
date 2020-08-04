@@ -8,6 +8,8 @@
 int main(int argc, char *argv[]){
 
 // Vars
+
+	// Textures
     SDL_Window* screen = NULL;
 	SDL_Surface* Loading_Surface = NULL;
     SDL_Surface* Background_Surface = NULL;
@@ -15,9 +17,22 @@ int main(int argc, char *argv[]){
 	SDL_Surface* PadBall_Surface = NULL;
     SDL_Surface* Heart_Surface = NULL;
     SDL_Surface* Hud_Surface = NULL;
+	#ifdef _SDL2
+    SDL_Renderer* Renderer;
+    SDL_Texture* Background_Texture = NULL;
+    SDL_Texture* BrickSheet_Texture = NULL;
+	SDL_Texture* PadBall_Texture = NULL;
+    SDL_Texture* Heart_Texture = NULL;
+    SDL_Texture* Hud_Texture = NULL;
+    #endif
+
+	// Music
+	Mix_Music* BackgroundMusic = NULL;
+
+	// Sounds Effects
+	Mix_Chunk* BallBounce = NULL;
 
 	Uint32 ColorKey;
-
 	SDL_Joystick* Player1 = NULL;
 	Vector2s Lstick;
 
@@ -38,17 +53,10 @@ int main(int argc, char *argv[]){
     SDL_Event event;
     const Uint8* KeyStates;
 
-    #ifdef _SDL2
-    SDL_Renderer* Renderer;
-    SDL_Texture* Background_Texture = NULL;
-    SDL_Texture* BrickSheet_Texture = NULL;
-	SDL_Texture* PadBall_Texture = NULL;
-    SDL_Texture* Heart_Texture = NULL;
-    SDL_Texture* Hud_Texture = NULL;
-    #endif
-
 	Uint32 OldTime, NewTime, DeltaTime;
 	double FrameTimeLimit;
+
+	LD_LAUNCH_DASHBOARD LaunchData;
 
     int i, j;
 
@@ -71,20 +79,20 @@ int main(int argc, char *argv[]){
     if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
         fprintf(stderr, "SDL Initialisation failed\n%s\n", SDL_GetError());
     }
-    
-    #ifdef _INIT_IMG
-    // SDL_Image Init
-    if(IMG_Init(IMG_INIT_PNG) != 0){
-        fprintf(stderr, "SDL_Image Initialisation failed\n%s\n", IMG_GetError());
-    }
-    #endif
 
+	// SDL_Mixer init
+	if ((Mix_Init(MIX_INIT_MP3)&MIX_INIT_MP3) != MIX_INIT_MP3){
+		fprintf(stderr, "MP3 Initialisation failed\n%s\n", Mix_GetError());
+	}
+	if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1){
+		fprintf(stderr, "SDL_Mixer Initialisation failed\n%s\n", Mix_GetError());
+	}
  
     printf("Hey everything works :3\n");
     // Creating the Window/Screen
     #ifdef _SDL
     screen = SDL_SetVideoMode(640, 480, 0, SDL_HWSURFACE);
-	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1); Vsync
+	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1); //Vsync
     KeyStates = SDL_GetKeyState(NULL);
     #else
     screen = SDL_CreateWindow("Henlo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_X, SCREEN_Y, SDL_WINDOW_SHOWN);
@@ -107,17 +115,17 @@ int main(int argc, char *argv[]){
     }
     #endif
     // Loading Sprites
-    Background_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"""Background.png");
-    BrickSheet_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"Brick.png");
+    Background_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"""Background"TEX);
+    BrickSheet_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"Brick"TEX);
 
-	PadBall_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"PadBall.png");
-    Heart_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"Heart.png");
+	PadBall_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"PadBall"TEX);
+    Heart_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"Heart"TEX);
 
     // Color key
     SetColorKey(PadBall_Surface, 0, 0xff, 0);
     SetColorKey(Heart_Surface, 0, 0xff, 0);
 
-	Hud_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"Hud3.png");
+	Hud_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"Hud3"TEX);
 
 	Heart_Pos.x = 10;	Heart_Pos.y = 5;	Heart_Pos.w = Heart_Surface->w;	Heart_Pos.h = Heart_Surface->h;
 	Hud_Pos.x = 0;	Hud_Pos.y = 0;	Hud_Pos.w = Hud_Surface->w;	Hud_Pos.h = Hud_Surface->h;
@@ -141,6 +149,16 @@ int main(int argc, char *argv[]){
         }
     }
 
+	// Loading Music
+	BackgroundMusic = LoadMusicFromFile(ROOT""_SOUNDS"BGTheme"SMX);
+
+	// Loading Sounds effects
+	BallBounce = LoadChuckFromFile(ROOT""_SOUNDS"Click2"SDX);
+	if (BallBounce == NULL){
+		return 0;
+	}
+	Mix_VolumeMusic(MIX_MAX_VOLUME/2);
+	Mix_PlayMusic(BackgroundMusic, -1); // Play the background music forever
     // Settings position and Logic
 GameInit:
     // Default pos
@@ -272,9 +290,11 @@ GameInit:
         // Bounce with the wall
         if (((BallFPos.x + (Ball_Rect.w >> 1)) > SCREEN_X) || ((BallFPos.x + (Ball_Rect.w >> 1)) < 0)){
             BallSpeed.x = -BallSpeed.x;
+			Mix_PlayChannel(-1, BallBounce, 0);
         }
         if ((BallFPos.y + (Ball_Rect.h >> 1)) < HUDHEIGHT){
             BallSpeed.y = -BallSpeed.y;
+			Mix_PlayChannel(-1, BallBounce, 0);
         }
 
         if (BallThrown){
@@ -298,13 +318,16 @@ GameInit:
         }
 
         // Bounce with the Bar
-        Bounce(&Ball_Pos, &Pad_Pos, &BallSpeed);
+		if(Bounce(&Ball_Pos, &Pad_Pos, &BallSpeed)){
+			Mix_PlayChannel(-1, BallBounce, 0);
+		}
 
         // Bounce with the bricks
         for (i = 0; i < (BRICK_X*BRICK_Y); i++){
             if (Brick_Hit[i]){
                 if (Bounce(&Ball_Pos, &Brick_Pos[i], &BallSpeed)){
                     Brick_Hit[i] = 0;
+					Mix_PlayChannel(-1, BallBounce, 0);
                 }
             }
         }
@@ -367,12 +390,19 @@ Shutdown:
     #ifdef _SDL2
     SDL_DestroyTexture(Background_Texture);
     #endif
+	
+	Mix_FreeChunk(BallBounce);
+	Mix_FreeMusic(BackgroundMusic);
 
+	// Api cleanup
+#ifdef _PNG
     IMG_Quit();
+#endif
+	Mix_CloseAudio();
+	Mix_Quit();
     SDL_Quit();
 
     #ifdef _XBOX
-    LD_LAUNCH_DASHBOARD LaunchData;
     LaunchData.dwReason = XLD_LAUNCH_DASHBOARD_MAIN_MENU;
     XLaunchNewImage(NULL, (LAUNCH_DATA*)&LaunchData);
     #endif
