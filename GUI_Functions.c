@@ -50,32 +50,32 @@ char IsRectColliding(SDL_Rect* Rect1, SDL_Rect* Rect2){
 char Bounce(SDL_Rect* Rect1, SDL_Rect* Rect2, Vector2f* BallSpeed) {
     char BallSides = 0;
     if((BallSides = IsRectColliding(Rect1, Rect2))){ // If the Ball is colliding with the bottom bar
-        if ((BallSides & COL_RIGHT) && (BallSides & COL_LEFT)){
+        if ((BallSides & COL_RIGHT) && (BallSides & COL_LEFT)){ // Sides
             BallSpeed->y = -BallSpeed->y;
-        } else if ((BallSides & COL_DOWN) && (BallSides & COL_UP)){
+        } else if ((BallSides & COL_DOWN) && (BallSides & COL_UP)){ // Sides
             BallSpeed->x = -BallSpeed->x;
-        } else if ((BallSides & COL_RIGHT) && (BallSides & COL_UP)){
+        } else if ((BallSides & COL_RIGHT) && (BallSides & COL_UP)){ // Corner
             if (BallSpeed->x >= 0){
                 BallSpeed->x = -BallSpeed->x;
             }
             if (BallSpeed->y < 0){
                 BallSpeed->y = -BallSpeed->y;
             }
-        } else if ((BallSides & COL_LEFT) && (BallSides & COL_DOWN)){
+        } else if ((BallSides & COL_LEFT) && (BallSides & COL_DOWN)){ // Corner
             if (BallSpeed->x < 0){
                 BallSpeed->x = -BallSpeed->x;
             }
             if (BallSpeed->y >= 0) {
                 BallSpeed->y = -BallSpeed->y;
             }
-        } else if ((BallSides & COL_RIGHT) && (BallSides & COL_DOWN)){
+        } else if ((BallSides & COL_RIGHT) && (BallSides & COL_DOWN)){ // Corner
             if (BallSpeed->x >= 0){
                 BallSpeed->x = -BallSpeed->x;
             }
             if (BallSpeed->y >= 0){
                 BallSpeed->y = -BallSpeed->y;
             }
-        } else if ((BallSides & COL_LEFT) && (BallSides & COL_UP)){
+        } else if ((BallSides & COL_LEFT) && (BallSides & COL_UP)){ // Corner
             if (BallSpeed->x < 0){
                 BallSpeed->x = -BallSpeed->x;
             }
@@ -119,7 +119,11 @@ SDL_Surface* LoadSufaceFromFile(char Path[]){
 	Return_Surface = SDL_DisplayFormat(Loading_Surface);
     SDL_FreeSurface(Loading_Surface);
     #else
+#ifdef _PNG
     Return_Surface = IMG_Load(Path);
+#else
+    Return_Surface = SDL_LoadBMP(Path);
+#endif
     #endif
     if (Return_Surface == NULL){
 #ifdef _PNG

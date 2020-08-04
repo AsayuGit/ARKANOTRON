@@ -32,7 +32,6 @@ int main(int argc, char *argv[]){
 	// Sounds Effects
 	Mix_Chunk* BallBounce = NULL;
 
-	Uint32 ColorKey;
 	SDL_Joystick* Player1 = NULL;
 	Vector2s Lstick;
 
@@ -56,7 +55,9 @@ int main(int argc, char *argv[]){
 	Uint32 OldTime, NewTime, DeltaTime;
 	double FrameTimeLimit;
 
+    #ifdef _XBOX
 	LD_LAUNCH_DASHBOARD LaunchData;
+    #endif
 
     int i, j;
 
@@ -77,25 +78,25 @@ int main(int argc, char *argv[]){
 
     // SDL Init
     if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
-        fprintf(stderr, "SDL Initialisation failed\n%s\n", SDL_GetError());
+        fprintf(stderr, "SDL Initialisation failed (%s)\n", SDL_GetError());
     }
 
 	// SDL_Mixer init
-	if ((Mix_Init(MIX_INIT_MP3)&MIX_INIT_MP3) != MIX_INIT_MP3){
-		fprintf(stderr, "MP3 Initialisation failed\n%s\n", Mix_GetError());
-	}
 	if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1){
-		fprintf(stderr, "SDL_Mixer Initialisation failed\n%s\n", Mix_GetError());
+		fprintf(stderr, "SDL_Mixer Initialisation failed (%s)\n", Mix_GetError());
+	}
+    if ((Mix_Init(MIX_INIT_MP3)&MIX_INIT_MP3) != MIX_INIT_MP3){
+		fprintf(stderr, "MP3 Initialisation failed (%s)\n", Mix_GetError());
 	}
  
-    printf("Hey everything works :3\n");
     // Creating the Window/Screen
     #ifdef _SDL
     screen = SDL_SetVideoMode(640, 480, 0, SDL_HWSURFACE);
+    SDL_WM_SetCaption("ARKANOTRON", NULL);
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1); //Vsync
     KeyStates = SDL_GetKeyState(NULL);
     #else
-    screen = SDL_CreateWindow("Henlo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_X, SCREEN_Y, SDL_WINDOW_SHOWN);
+    screen = SDL_CreateWindow("ARKANOTRON", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_X, SCREEN_Y, SDL_WINDOW_SHOWN);
     Renderer = SDL_CreateRenderer(screen, -1, 0);
     SDL_GL_SetSwapInterval(1); // VSync
     KeyStates = SDL_GetKeyboardState(NULL);
@@ -290,10 +291,12 @@ GameInit:
         // Bounce with the wall
         if (((BallFPos.x + (Ball_Rect.w >> 1)) > SCREEN_X) || ((BallFPos.x + (Ball_Rect.w >> 1)) < 0)){
             BallSpeed.x = -BallSpeed.x;
+            BallFPos.x += BallSpeed.x * DeltaTime;
 			Mix_PlayChannel(-1, BallBounce, 0);
         }
         if ((BallFPos.y + (Ball_Rect.h >> 1)) < HUDHEIGHT){
             BallSpeed.y = -BallSpeed.y;
+            BallFPos.y += BallSpeed.y *DeltaTime;
 			Mix_PlayChannel(-1, BallBounce, 0);
         }
 
@@ -320,6 +323,8 @@ GameInit:
         // Bounce with the Bar
 		if(Bounce(&Ball_Pos, &Pad_Pos, &BallSpeed)){
 			Mix_PlayChannel(-1, BallBounce, 0);
+            BallFPos.x += BallSpeed.x * DeltaTime;
+            BallFPos.y += BallSpeed.y *DeltaTime;
 		}
 
         // Bounce with the bricks
@@ -328,6 +333,8 @@ GameInit:
                 if (Bounce(&Ball_Pos, &Brick_Pos[i], &BallSpeed)){
                     Brick_Hit[i] = 0;
 					Mix_PlayChannel(-1, BallBounce, 0);
+                    BallFPos.x += BallSpeed.x * DeltaTime;
+                    BallFPos.y += BallSpeed.y *DeltaTime;
                 }
             }
         }

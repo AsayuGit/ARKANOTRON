@@ -32,16 +32,16 @@
 #define JOY_LSTICK 10
 #define JOY_RSTICK 11
 #else
-#define JOY_A 0 // Temp Values
+#define JOY_A 2 // Temp Values 
 #define JOY_B 1
-#define JOY_X 2
-#define JOY_Y 3
+#define JOY_X 3
+#define JOY_Y 0
 #define JOY_BLACK 4
 #define JOY_WHITE 5
 #define JOY_LTRIGGER 6
 #define JOY_RTRIGGER 7
-#define JOY_START 8
-#define JOY_BACK 9
+#define JOY_START 9
+#define JOY_BACK 8
 #define JOY_LSTICK 10
 #define JOY_RSTICK 11
 #endif

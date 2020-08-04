@@ -29,7 +29,9 @@
 #endif
 
 #include SDLMAIN
-//#include SDLIMAGE
+#ifdef _PNG
+#include SDLIMAGE
+#endif
 #include SDLMIXER
 
 #include "types.h"
@@ -51,6 +53,7 @@
 #define BRICK_Y 5
 #define NBOFLIVES 3
 #define HUDHEIGHT 43
+#define BOUNCE_OFFSET 5 // Prevent the ball from glitching in a wall
 
 #define DEADZONE 0
 #define STICK_MAX 32768.0f
