@@ -8,6 +8,8 @@
 #define COL_UP 8
 #define COL_DOWN 4
 
+// Graphics related functions
+
 // Scale a line by a factor of the screen resolution
 void ScaleLine(int* line, int ScreenResolution, float ScalingFactor);
 

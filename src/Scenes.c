@@ -1,16 +1,8 @@
-// ARKANOTRON.cpp : Defines the entry point for the application.
-//
-#ifdef _XBOX
-#include "stdafx.h"
-#endif
-#include "include.h"
+#include "Scenes.h"
 
-int main(int argc, char *argv[]){
-
+int MainGAME(int argc, char* argv[], DisplayDevice* DDevice, InputDevice* IDevice){
 // Vars
-
 	// Textures
-    SDL_Window* screen = NULL;
 	SDL_Surface* Loading_Surface = NULL;
     SDL_Surface* Background_Surface = NULL;
     SDL_Surface* BrickSheet_Surface = NULL;
@@ -18,7 +10,6 @@ int main(int argc, char *argv[]){
     SDL_Surface* Heart_Surface = NULL;
     SDL_Surface* Hud_Surface = NULL;
 	#ifdef _SDL2
-    SDL_Renderer* Renderer;
     SDL_Texture* Background_Texture = NULL;
     SDL_Texture* BrickSheet_Texture = NULL;
 	SDL_Texture* PadBall_Texture = NULL;
@@ -32,7 +23,7 @@ int main(int argc, char *argv[]){
 	// Sounds Effects
 	Mix_Chunk* BallBounce = NULL;
 
-	SDL_Joystick* Player1 = NULL;
+    // Inputs
 	Vector2s Lstick;
 
     SDL_Rect Pad_Rect, Ball_Rect;
@@ -47,10 +38,9 @@ int main(int argc, char *argv[]){
     float PadSpeed;
     unsigned int Lives;
 
-    char BallThrown, JoyAvailable;
+    char BallThrown;
 
     SDL_Event event;
-    const Uint8* KeyStates;
 
 	Uint32 OldTime, NewTime, DeltaTime;
 	double FrameTimeLimit;
@@ -62,59 +52,8 @@ int main(int argc, char *argv[]){
     int i, j;
 
 // Code
-    srand(time(NULL));
-	OldTime = 0; NewTime = 0; FrameTimeLimit = 1000.0 / (double)MAX_FPS; JoyAvailable = 1;
+	OldTime = 0; NewTime = 0; FrameTimeLimit = 1000.0 / (double)MAX_FPS; IDevice->JoySupport = 1;
 
-    // Terminal parameters
-    i = 1;
-    while (i < argc){
-        if (strcmp(argv[i], "-NoJoystick") == 0){
-            JoyAvailable = 0;
-            printf("Joystick Dissabled\n");
-        }
-        i++;
-    }
-
-
-    // SDL Init
-    if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
-        fprintf(stderr, "SDL Initialisation failed (%s)\n", SDL_GetError());
-    }
-
-	// SDL_Mixer init
-	if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1){
-		fprintf(stderr, "SDL_Mixer Initialisation failed (%s)\n", Mix_GetError());
-	}
-    if ((Mix_Init(MIX_INIT_MP3)&MIX_INIT_MP3) != MIX_INIT_MP3){
-		fprintf(stderr, "MP3 Initialisation failed (%s)\n", Mix_GetError());
-	}
- 
-    // Creating the Window/Screen
-    #ifdef _SDL
-    screen = SDL_SetVideoMode(640, 480, 0, SDL_HWSURFACE);
-    SDL_WM_SetCaption("ARKANOTRON", NULL);
-	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1); //Vsync
-    KeyStates = SDL_GetKeyState(NULL);
-    #else
-    screen = SDL_CreateWindow("ARKANOTRON", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_X, SCREEN_Y, SDL_WINDOW_SHOWN);
-    Renderer = SDL_CreateRenderer(screen, -1, 0);
-    SDL_GL_SetSwapInterval(1); // VSync
-    KeyStates = SDL_GetKeyboardState(NULL);
-    #endif
-    
-    if (SDL_NumJoysticks() && JoyAvailable){
-	    Player1 = SDL_JoystickOpen(0); // Attempt to allocate Player1 to the first joystick
-        printf("There is %d available Joysticks\n", SDL_NumJoysticks());
-    }
-    #ifdef _SDL
-    JoyAvailable = SDL_JoystickOpened(0);
-    #else
-    if (Player1 == NULL){
-        JoyAvailable = 0;
-    }else{
-        JoyAvailable = 1;
-    }
-    #endif
     // Loading Sprites
     Background_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"""Background"TEX);
     BrickSheet_Surface = LoadSufaceFromFile(ROOT""_TEXTURE"Brick"TEX);
@@ -131,15 +70,15 @@ int main(int argc, char *argv[]){
 	Heart_Pos.x = 10;	Heart_Pos.y = 5;	Heart_Pos.w = Heart_Surface->w;	Heart_Pos.h = Heart_Surface->h;
 	Hud_Pos.x = 0;	Hud_Pos.y = 0;	Hud_Pos.w = Hud_Surface->w;	Hud_Pos.h = Hud_Surface->h;
     #ifdef _SDL2
-    Background_Texture = SDL_CreateTextureFromSurface(Renderer, Background_Surface);
+    Background_Texture = SDL_CreateTextureFromSurface(DDevice->Renderer, Background_Surface);
     SDL_FreeSurface(Background_Surface);
-    BrickSheet_Texture = SDL_CreateTextureFromSurface(Renderer, BrickSheet_Surface);
+    BrickSheet_Texture = SDL_CreateTextureFromSurface(DDevice->Renderer, BrickSheet_Surface);
     SDL_FreeSurface(BrickSheet_Surface);
-	PadBall_Texture = SDL_CreateTextureFromSurface(Renderer, PadBall_Surface);
+	PadBall_Texture = SDL_CreateTextureFromSurface(DDevice->Renderer, PadBall_Surface);
 	SDL_FreeSurface(PadBall_Surface);
-    Heart_Texture = SDL_CreateTextureFromSurface(Renderer, Heart_Surface);
+    Heart_Texture = SDL_CreateTextureFromSurface(DDevice->Renderer, Heart_Surface);
     SDL_FreeSurface(Heart_Surface);
-    Hud_Texture = SDL_CreateTextureFromSurface(Renderer, Hud_Surface);
+    Hud_Texture = SDL_CreateTextureFromSurface(DDevice->Renderer, Hud_Surface);
     SDL_FreeSurface(Hud_Surface);
     #endif
 	Pad_Rect.x = 0;	Pad_Rect.y = 32;	Pad_Rect.w = 160;	Pad_Rect.h = 25;
@@ -245,19 +184,19 @@ GameInit:
         }
 
 		// Joystick control
-        if (JoyAvailable){
+        if (IDevice->JoySupport){
             SDL_JoystickUpdate();
-            if (SDL_JoystickGetButton(Player1, JOY_A)){
+            if (SDL_JoystickGetButton(IDevice->Joy1, JOY_A)){
                 BallThrown = 1;
             }
-            if (SDL_JoystickGetButton(Player1, JOY_BACK)){
+            if (SDL_JoystickGetButton(IDevice->Joy1, JOY_BACK)){
                 goto GameInit;
             }
-            if (SDL_JoystickGetButton(Player1, JOY_BLACK)){ // Back to the dash (SoftReset) [XBOX]
+            if (SDL_JoystickGetButton(IDevice->Joy1, JOY_BLACK)){ // Back to the dash (SoftReset) [XBOX]
                 goto Shutdown;
             }
-            Lstick.x = SDL_JoystickGetAxis(Player1, 0);
-            Lstick.y = SDL_JoystickGetAxis(Player1, 1);
+            Lstick.x = SDL_JoystickGetAxis(IDevice->Joy1, 0);
+            Lstick.y = SDL_JoystickGetAxis(IDevice->Joy1, 1);
 
             // Deadzone controll
             if ((Lstick.x < DEADZONE) && (Lstick.x > -DEADZONE)){
@@ -268,9 +207,9 @@ GameInit:
         }
 
 		// Pad Mouvement
-        if (KeyStates[ARK_LEFT]){
+        if (IDevice->KeyStates[ARK_LEFT]){
             PadFPos.x -= PadSpeed * DeltaTime;
-        }else if (KeyStates[ARK_RIGHT]){
+        }else if (IDevice->KeyStates[ARK_RIGHT]){
             PadFPos.x += PadSpeed * DeltaTime;
         }
 
@@ -351,37 +290,36 @@ GameInit:
 
         // Drawing Everything On Screen
         #ifdef _SDL
-        SDL_BlitSurface(Background_Surface, NULL, screen, NULL); // Draw the background
-        SDL_BlitSurface(PadBall_Surface, &Ball_Rect, screen, &Ball_Pos); // Draw the ball
-        SDL_BlitSurface(PadBall_Surface, &Pad_Rect, screen, &Pad_Pos); // Draw the bottom bar
+        SDL_BlitSurface(Background_Surface, NULL, DDevice->Screen, NULL); // Draw the background
+        SDL_BlitSurface(PadBall_Surface, &Ball_Rect, DDevice->Screen, &Ball_Pos); // Draw the ball
+        SDL_BlitSurface(PadBall_Surface, &Pad_Rect, DDevice->Screen, &Pad_Pos); // Draw the bottom bar
 		for (i = 0; i < (BRICK_X*BRICK_Y); i++){
             if (Brick_Hit[i]){
-                SDL_BlitSurface(BrickSheet_Surface, &Brick_Rect[Brick_Color[i]], screen, &Brick_Pos[i]); // Draw the briks
+                SDL_BlitSurface(BrickSheet_Surface, &Brick_Rect[Brick_Color[i]], DDevice->Screen, &Brick_Pos[i]); // Draw the briks
             }
         }
-        SDL_BlitSurface(Hud_Surface, NULL, screen, NULL); // Draw the Hud
+        SDL_BlitSurface(Hud_Surface, NULL, DDevice->Screen, NULL); // Draw the Hud
         for (i = 0; i < (int)Lives; i++){
-            //SDL_BlitSurface(Heart_Surface, NULL, screen, &(SDL_Rect){Heart_Pos.x + i * (Heart_Pos.h + 15), Heart_Pos.y, Heart_Pos.w, Heart_Pos.h}); // Draw the hearts
 			Heart_Pos.x = 10 + i * (Heart_Pos.h + 15);
-			SDL_BlitSurface(Heart_Surface, NULL, screen, &Heart_Pos);
+			SDL_BlitSurface(Heart_Surface, NULL, DDevice->Screen, &Heart_Pos); // Draw the hearts
         }
 
-        SDL_Flip(screen);
+        SDL_Flip(DDevice->Screen);
         #else
-        SDL_RenderClear(Renderer);
-        SDL_RenderCopy(Renderer, Background_Texture, NULL, NULL); // Draw the background
-        SDL_RenderCopy(Renderer, PadBall_Texture, &Ball_Rect, &Ball_Pos); // Draw the ball
-        SDL_RenderCopy(Renderer, PadBall_Texture, &Pad_Rect, &Pad_Pos); // Draw the bottom bar
+        SDL_RenderClear(DDevice->Renderer);
+        SDL_RenderCopy(DDevice->Renderer, Background_Texture, NULL, NULL); // Draw the background
+        SDL_RenderCopy(DDevice->Renderer, PadBall_Texture, &Ball_Rect, &Ball_Pos); // Draw the ball
+        SDL_RenderCopy(DDevice->Renderer, PadBall_Texture, &Pad_Rect, &Pad_Pos); // Draw the bottom bar
         for (i = 0; i < (BRICK_X*BRICK_Y); i++){
             if (Brick_Hit[i]){
-                SDL_RenderCopy(Renderer, BrickSheet_Texture, &Brick_Rect[Brick_Color[i]], &Brick_Pos[i]); // Draw the briks
+                SDL_RenderCopy(DDevice->Renderer, BrickSheet_Texture, &Brick_Rect[Brick_Color[i]], &Brick_Pos[i]); // Draw the briks
             }
         }
-        SDL_RenderCopy(Renderer, Hud_Texture, NULL, &Hud_Pos);// Draw the Hud
+        SDL_RenderCopy(DDevice->Renderer, Hud_Texture, NULL, &Hud_Pos);// Draw the Hud
         for (int i = 0; i < Lives; i++){
-            SDL_RenderCopy(Renderer, Heart_Texture, NULL, &(SDL_Rect){Heart_Pos.x + i * (Heart_Pos.h + 15), Heart_Pos.y, Heart_Pos.w, Heart_Pos.h}); // Draw the hearts
+            SDL_RenderCopy(DDevice->Renderer, Heart_Texture, NULL, &(SDL_Rect){Heart_Pos.x + i * (Heart_Pos.h + 15), Heart_Pos.y, Heart_Pos.w, Heart_Pos.h}); // Draw the hearts
         }
-        SDL_RenderPresent(Renderer);
+        SDL_RenderPresent(DDevice->Renderer);
         #endif
         //SDL_Delay(16); // 60fps lock, kinda
     }
@@ -389,7 +327,7 @@ GameInit:
 Shutdown:
     #ifdef _SDL
     if (SDL_JoystickOpened(0)){
-		SDL_JoystickClose(Player1);
+		SDL_JoystickClose(IDevice->Joy1);
 	}
     SDL_FreeSurface(Background_Surface);
     #endif

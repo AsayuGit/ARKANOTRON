@@ -38,9 +38,11 @@
 #include "GUI_Functions.h"
 #include "GAME_Functions.h"
 #include "keymap.h"
+#include "System.h"
 #include <time.h>
 #include <math.h>
 #include <string.h>
+#include "Scenes.h"
 
 // Game settings
 #define SCREEN_X 640
